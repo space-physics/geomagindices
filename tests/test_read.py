@@ -2,8 +2,6 @@
 import pytest
 from pytest import approx
 import geomagindices as gi
-import socket
-import requests.exceptions
 from datetime import date, timedelta
 
 
@@ -13,7 +11,7 @@ def test_past():
 
     try:
         dat = gi.getApF107(tstr, 81)
-    except socket.error as e:
+    except ConnectionError as e:
         pytest.skip(f'possible timeout error {e}')
 
     assert dat.time.item() == t
@@ -30,7 +28,7 @@ def test_nearfuture():
 
     try:
         dat = gi.getApF107(t)
-    except requests.exceptions.ConnectionError as e:
+    except ConnectionError as e:
         pytest.skip(f'possible timeout error {e}')
 
     assert dat.time.item() == t
@@ -43,10 +41,7 @@ def test_farfuture():
 
     t = date(2029, 12, 21)
 
-    try:
-        dat = gi.getApF107(t, 81)
-    except requests.exceptions.ConnectionError as e:
-        pytest.skip(f'possible timeout error {e}')
+    dat = gi.getApF107(t, 81)
 
     assert t - timedelta(days=31) <= dat.time.item() <= t + timedelta(days=31)
 

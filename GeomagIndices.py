@@ -13,4 +13,4 @@ if __name__ == '__main__':
 
     inds = gi.getApF107(a.date)
 
-    print(inds)
+    print(f'{inds.time.item()}   Ap: {inds.Ap.item()}  f10.7: {inds.f107.item()}')
