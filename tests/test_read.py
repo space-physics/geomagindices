@@ -2,7 +2,7 @@
 import pytest
 from pytest import approx
 import geomagindices as gi
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 
 
 def test_past():
@@ -14,12 +14,13 @@ def test_past():
     except ConnectionError as e:
         pytest.skip(f'possible timeout error {e}')
 
-    assert dat.name == t
+    assert dat.shape == (1, 4)
+    assert dat.index[0] == t
 
-    assert dat['f107'] == approx(77.9)
-    assert dat['f107s'] == approx(82.533333)
-    assert dat['Ap'] == approx(12.)
-    assert dat['Aps'] == approx(13.333333)
+    assert dat['f107'].item() == approx(77.9)
+    assert dat['f107s'].item() == approx(82.533333)
+    assert dat['Ap'].item() == approx(12.)
+    assert dat['Aps'].item() == approx(13.333333)
 
 
 def test_nearfuture():
@@ -31,7 +32,8 @@ def test_nearfuture():
     except ConnectionError as e:
         pytest.skip(f'possible timeout error {e}')
 
-    assert dat.name == t
+    assert dat.shape == (1, 2)
+    assert dat.index[0] == t
 
     assert 'Ap' in dat
     assert 'f107' in dat
@@ -43,18 +45,22 @@ def test_farfuture():
 
     dat = gi.get_indices(t, 81)
 
-    assert dat.name == date(2030, 1, 1)
+    assert dat.shape == (1, 4)
+    assert dat.index[0] == date(2030, 1, 1)
 
     assert 'Ap' in dat
     assert 'f107' in dat
+    assert 'f107s' in dat
+    assert 'Aps' in dat
 
 
-def test_xarray():
-    xarray = pytest.importorskip('xarray')
+def test_list():
 
-    dat = gi.getApF107(date(2000, 12, 21))
+    t = [date(2019, 1, 1), datetime(2019, 1, 2)]
 
-    assert isinstance(dat, xarray.DataArray)
+    dat = gi.get_indices(t)
+
+    assert (dat.index == date(2019, 1, 1)).all
 
 
 if __name__ == '__main__':

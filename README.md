@@ -7,12 +7,9 @@
 # Geomagnetic Indices
 Geomagnetic indices downloader and parser, returns Ap, F10.7 (unsmoothed and smoothed).
 
-Output datatype is:
+Output datatype is [pandas.DataFrame](http://pandas.pydata.org/pandas-docs/stable/reference/frame.html) (for multiple times)
 
-* [pandas.Series](http://pandas.pydata.org/pandas-docs/stable/reference/series.html)  (for single datetime)
-* [pandas.DataFrame](http://pandas.pydata.org/pandas-docs/stable/reference/frame.html) (for multiple times)
-
-internally, uses 
+internally, uses
 [pandas.Index.get_loc](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Index.get_loc.html)
 to find nearest time to request.
 
@@ -23,5 +20,5 @@ import geomagindices as gi
 inds = gi.get_indices(date)
 ```
 
-where date is Python 
+where date is Python
 [datetime.date, datetime.datetime](https://docs.python.org/3/library/datetime.html), etc.

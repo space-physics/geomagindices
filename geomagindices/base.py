@@ -19,21 +19,9 @@ def get_indices(time: Union[str, datetime, date],
     20 year Forecast data from:
     https://sail.msfc.nasa.gov/solar_report_archives/May2016Rpt.pdf
     """
-    dt = todate(time)
+    dtime = todate(time)
 
-    if not isinstance(dt, date) and not isinstance(dt[0], date):
-        raise TypeError('must have datetime.date input')
-
-    if isinstance(dt, (list, tuple, np.ndarray)):
-        Tind = pandas.DataFrame(columns=['Ap', 'Aps',
-                                         'f107', 'f107s', 'Ap', 'Aps'],
-                                index=dt)
-        for d in dt:
-            Tind = pandas.concat((Tind, get_indices(d, smoothdays, forcedownload)))
-
-        return Tind.dropna(axis=0, how='all')
-
-    fn = downloadfile(dt, forcedownload)
+    fn = downloadfile(dtime, forcedownload)
 # %% load data
     dat = load(fn)
 # %% optional smoothing over days
@@ -41,26 +29,14 @@ def get_indices(time: Union[str, datetime, date],
         periods = np.rint(timedelta(days=smoothdays) / (dat.index[1] - dat.index[0])).astype(int)
         dat['f107s'] = moving_average(dat['f107'], periods)
         dat['Aps'] = moving_average(dat['Ap'], periods)
-# %% pull out the time we want
-    try:
-        Indices = dat.loc[dt, :]
-    except KeyError:
-        logging.info('nearest time used')
-        i = dat.index.get_loc(dt, method='nearest')
-        Indices = dat.iloc[i, :]
+# %% pull out the times we want
+    i = [dat.index.get_loc(t, method='nearest') for t in dtime]
+    Indices = dat.iloc[i, :]
 
     return Indices
 
 
-def getApF107(time: Union[str, datetime, date],
-              smoothdays: int = None,
-              forcedownload: bool = False):
-    """
-    outputs xarray instead of pandas for legacy compatibility
-
-    requires xarray is installed
-    """
-    return get_indices(time, smoothdays, forcedownload).to_xarray()
+getApF107 = get_indices  # legacy
 
 
 def moving_average(dat, periods: int) -> np.ndarray:
@@ -72,7 +48,7 @@ def moving_average(dat, periods: int) -> np.ndarray:
                        mode='same')
 
 
-def todate(time: Union[str, date, datetime, np.datetime64]) -> Union[date, List[date]]:
+def todate(time: Union[str, date, datetime, np.datetime64]) -> np.ndarray:
 
     if isinstance(time, str):
         d = todate(parse(time))
@@ -80,13 +56,13 @@ def todate(time: Union[str, date, datetime, np.datetime64]) -> Union[date, List[
         d = time.date()
     elif isinstance(time, np.datetime64):
         d = time.astype(date)
-        if isinstance(d, datetime):
-            d = d.date()
     elif isinstance(time, date):
         d = time
     elif isinstance(time, (tuple, list, np.ndarray)):
-        d = list(map(todate, time))  # type: ignore
+        d = np.atleast_1d([todate(t) for t in time]).squeeze()
     else:
         raise TypeError(f'{time} must be representable as datetime.date')
 
-    return d
+    dates = np.atleast_1d(d).ravel()
+
+    return dates

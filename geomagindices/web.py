@@ -7,35 +7,39 @@ from typing import Union, Tuple
 import subprocess
 import socket
 import requests.exceptions
+import numpy as np
 
 URLrecent = 'ftp://ftp.swpc.noaa.gov/pub/weekly/RecentIndices.txt'
 URL45dayfcast = 'http://services.swpc.noaa.gov/text/45-day-ap-forecast.txt'
 URL20yearfcast = 'https://sail.msfc.nasa.gov/solar_report_archives/May2016Rpt.pdf'
 
 
-def selectApfile(time: Union[datetime, date]) -> Tuple[Path, str]:
+def selectApfile(time: np.ndarray) -> Tuple[Path, str]:
     path = Path(__file__).parent / 'data'
     path.mkdir(exist_ok=True)
 
-    if isinstance(time, datetime):
-        time = time.date()
+    time = np.asarray(time)
 
     tnow = date.today()
 
-    if time < tnow:  # past
+    nearfuture = tnow + timedelta(days=45)
+
+    if (time < tnow).all():  # past
         url = URLrecent
         fn = path / url.split('/')[-1]
-    elif tnow <= time < tnow + timedelta(days=45):  # near future
+    elif (tnow <= time).all() & (time < nearfuture).all():  # near future
         url = URL45dayfcast
         fn = path / url.split('/')[-1]
-    else:  # future
+    elif (time > nearfuture).all():  # future
         url = ''
         fn = (path / URL20yearfcast.split('/')[-1]).with_suffix('.txt')
+    else:
+        raise NotImplementedError('make sure all times are before or after current time. Raise a GitHub issue if this is a problem')
 
     return fn, url
 
 
-def downloadfile(dt: Union[datetime, date], force: bool) -> Path:
+def downloadfile(dt: np.ndarray, force: bool) -> Path:
 
     fn, url = selectApfile(dt)
 
