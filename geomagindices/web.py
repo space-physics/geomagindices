@@ -43,8 +43,13 @@ def downloadfile(dt: np.ndarray, force: bool) -> Path:
 
     fn, url = selectApfile(dt)
 
-    if not url or (not force and fn.is_file() and fn.stat().st_size) > 0:
+    if not url:
         return fn
+
+    if not force and fn.is_file():
+        finf = fn.stat()
+        if finf.st_size > 1000 and (datetime.now() - datetime.fromtimestamp(finf.st_mtime)) < timedelta(days=30):
+            return fn
 
     print('download', fn, 'from', url)
 
