@@ -49,5 +49,13 @@ def test_farfuture():
     assert 'f107' in dat
 
 
+def test_xarray():
+    xarray = pytest.importorskip('xarray')
+
+    dat = gi.getApF107(date(2000, 12, 21))
+
+    assert isinstance(dat, xarray.DataArray)
+
+
 if __name__ == '__main__':
     pytest.main(['-x', __file__])

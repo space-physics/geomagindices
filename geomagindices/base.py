@@ -52,7 +52,15 @@ def get_indices(time: Union[str, datetime, date],
     return Indices
 
 
-getApF107 = get_indices
+def getApF107(time: Union[str, datetime, date],
+              smoothdays: int = None,
+              forcedownload: bool = False):
+    """
+    outputs xarray instead of pandas for legacy compatibility
+
+    requires xarray is installed
+    """
+    return get_indices(time, smoothdays, forcedownload).to_xarray()
 
 
 def moving_average(dat, periods: int) -> np.ndarray:
