@@ -5,13 +5,13 @@
 
 
 # Geomagnetic Indices
-Geomagnetic indices downloader and parser
+Geomagnetic indices downloader and parser, returns Ap, F10.7 (unsmoothed and smoothed).
 
 use from other programs like
 ```python
 import geomagindices as gi
 
-inds = gi.getApF107(date)
+inds = gi.get_indices(date)
 ```
 
 where date is datetime.date, datetime.datetime, etc.

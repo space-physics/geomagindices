@@ -10,11 +10,11 @@ def test_past():
     tstr = '2017-08-01'
 
     try:
-        dat = gi.getApF107(tstr, 81)
+        dat = gi.get_indices(tstr, 81)
     except ConnectionError as e:
         pytest.skip(f'possible timeout error {e}')
 
-    assert dat.time.item() == t
+    assert dat.name == t
 
     assert dat['f107'] == approx(77.9)
     assert dat['f107s'] == approx(82.533333)
@@ -27,11 +27,11 @@ def test_nearfuture():
     t = date.today() + timedelta(days=3)
 
     try:
-        dat = gi.getApF107(t)
+        dat = gi.get_indices(t)
     except ConnectionError as e:
         pytest.skip(f'possible timeout error {e}')
 
-    assert dat.time.item() == t
+    assert dat.name == t
 
     assert 'Ap' in dat
     assert 'f107' in dat
@@ -41,9 +41,9 @@ def test_farfuture():
 
     t = date(2029, 12, 21)
 
-    dat = gi.getApF107(t, 81)
+    dat = gi.get_indices(t, 81)
 
-    assert t - timedelta(days=31) <= dat.time.item() <= t + timedelta(days=31)
+    assert dat.name == date(2030, 1, 1)
 
     assert 'Ap' in dat
     assert 'f107' in dat

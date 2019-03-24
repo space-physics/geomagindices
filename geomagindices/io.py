@@ -1,5 +1,5 @@
 from pathlib import Path
-import xarray
+import pandas
 import numpy as np
 from dateutil.parser import parse
 
@@ -7,7 +7,7 @@ from .web import URLrecent, URL45dayfcast, URL20yearfcast
 import sciencedates as sd
 
 
-def load(fn: Path) -> xarray.Dataset:
+def load(fn: Path) -> pandas.DataFrame:
     fn = Path(fn).expanduser()
 
     if not fn.is_file():
@@ -25,7 +25,7 @@ def load(fn: Path) -> xarray.Dataset:
     return dat
 
 
-def read20yearfcast(fn: Path) -> xarray.Dataset:
+def read20yearfcast(fn: Path) -> pandas.DataFrame:
     """
     uses 50th percentile of Ap and f10.7
     """
@@ -35,27 +35,27 @@ def read20yearfcast(fn: Path) -> xarray.Dataset:
 
     date = [t.date() for t in time]
 
-    data = xarray.Dataset({'Ap': ('time', dat[:, 1]),
-                           'f107': ('time', dat[:, 2])},
-                          coords={'time': date})
+    data = pandas.DataFrame(data=dat[:, 1:3],
+                            index=date,
+                            columns=['Ap', 'f107'])
 
     return data
 
 
-def readpast(fn: Path) -> xarray.Dataset:
+def readpast(fn: Path) -> pandas.DataFrame:
     dat = np.loadtxt(fn, comments=('#', ':'), usecols=(0, 1, 7, 8, 9, 10))
     date = [parse(f'{ym[0]:.0f}-{ym[1]:02.0f}-01').date() for ym in dat[:, :2]]
 
-    data = xarray.Dataset({'f107': ('time', dat[:, 2]),
-                           'Ap': ('time', dat[:, 4])},
-                          coords={'time': date})
+    data = pandas.DataFrame(np.column_stack((dat[:, 4], dat[:, 2])),
+                            index=date,
+                            columns=['Ap', 'f107'])
 
     data = data.fillna(-1)  # by defn of NOAA
 
     return data
 
 
-def read45dayfcast(fn: Path) -> xarray.Dataset:
+def read45dayfcast(fn: Path) -> pandas.DataFrame:
     Ap = []
     time = []
 
@@ -70,9 +70,6 @@ def read45dayfcast(fn: Path) -> xarray.Dataset:
             for t, a in zip(ls[::2], ls[1::2]):
                 time.append(parse(t).date())
                 Ap.append(int(a))
-
-        dat = xarray.Dataset({'Ap': ('time', Ap)},
-                             coords={'time': time})
 # %% F10.7
         time = []
         f107 = []
@@ -85,6 +82,8 @@ def read45dayfcast(fn: Path) -> xarray.Dataset:
                 time.append(parse(t).date())
                 f107.append(int(a))
 
-        dat['f107'] = ('time', f107)
+        dat = pandas.DataFrame(data=np.column_stack((Ap, f107)),
+                               index=time,
+                               columns=['Ap', 'f107'])
 
     return dat
