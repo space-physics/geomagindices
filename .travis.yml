@@ -21,5 +21,10 @@ matrix:
     after_success:
     - pytest --cov
     - coveralls
+  - os: windows
+    language: minimal
+    before_install:
+    - choco install python3
+    - export PATH="/c/Python37:/c/Python37/Scripts:$PATH"
 
 script: pytest -rsv

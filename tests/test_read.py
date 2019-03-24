@@ -4,6 +4,9 @@ from pytest import approx
 import geomagindices as gi
 from datetime import date, timedelta, datetime
 import pandas
+import os
+
+CI = bool(os.environ.get('CI'))
 
 
 def test_past_date():
@@ -79,7 +82,10 @@ def test_list():
 
     t = [date(2018, 1, 1), datetime(2018, 1, 2)]
 
-    dat = gi.get_indices(t)
+    try:
+        dat = gi.get_indices(t)
+    except ConnectionError as e:
+        pytest.skip(f'possible timeout error {e}')
 
     assert (dat.index == [datetime(2018, 1, 1, 1, 30),
                           datetime(2018, 1, 2, 1, 30)]).all
@@ -89,7 +95,10 @@ def test_multi_past():
     dates = pandas.date_range(datetime(2017, 12, 31, 23), datetime(2018, 1, 1, 2),
                               freq='3H')
 
-    dat = gi.get_indices(dates)
+    try:
+        dat = gi.get_indices(dates)
+    except ConnectionError as e:
+        pytest.skip(f'possible timeout error {e}')
 
     assert (dat.index == [datetime(2017, 1, 1, 22, 30),
                           datetime(2018, 1, 1, 1, 30)]).all
@@ -98,7 +107,10 @@ def test_multi_past():
 def test_past_and_future():
     dates = [datetime(2017, 1, 1), datetime(2030, 3, 1)]
 
-    dat = gi.get_indices(dates)
+    try:
+        dat = gi.get_indices(dates)
+    except ConnectionError as e:
+        pytest.skip(f'possible timeout error {e}')
 
     dat.index
 
