@@ -3,37 +3,58 @@ import pytest
 from pytest import approx
 import geomagindices as gi
 from datetime import date, timedelta, datetime
+import pandas
 
 
-def test_past():
+def test_past_date():
     t = date(2017, 8, 1)
-    tstr = '2017-08-01'
 
     try:
-        dat = gi.get_indices(tstr, 81)
+        dat = gi.get_indices(t, 81)
     except ConnectionError as e:
         pytest.skip(f'possible timeout error {e}')
 
-    assert dat.shape == (1, 4)
-    assert dat.index[0] == t
+    assert dat.shape[0] == 1
+    assert dat.index[0] == datetime(2017, 8, 1, 1, 30)
 
-    assert dat['f107'].item() == approx(77.9)
-    assert dat['f107s'].item() == approx(82.533333)
-    assert dat['Ap'].item() == approx(12.)
-    assert dat['Aps'].item() == approx(13.333333)
+    assert dat['f107'].item() == approx(75.7)
+    assert dat['f107s'].item() == approx(84.611111, abs=0.01)
+    assert dat['Ap'].item() == 3
+    assert dat['Aps'].item() == approx(10.8888888, abs=0.01)
+
+
+def test_past_datetime():
+    t = datetime(2017, 8, 1, 12)
+
+    try:
+        dat = gi.get_indices(t, 81)
+    except ConnectionError as e:
+        pytest.skip(f'possible timeout error {e}')
+
+    assert dat.shape[0] == 1
+    assert dat.index[0] == datetime(2017, 8, 1, 13, 30)
+
+    assert dat['f107'].item() == approx(75.7)
+    assert dat['f107s'].item() == approx(84.7679012, abs=0.01)
+    assert dat['Ap'].item() == 9
+    assert dat['Aps'].item() == approx(10.9135802, abs=0.01)
 
 
 def test_nearfuture():
 
-    t = date.today() + timedelta(days=3)
+    t = datetime.today() + timedelta(days=3)
 
     try:
         dat = gi.get_indices(t)
     except ConnectionError as e:
         pytest.skip(f'possible timeout error {e}')
 
-    assert dat.shape == (1, 2)
-    assert dat.index[0] == t
+    assert dat.shape[0] == 1
+
+    if t.hour >= 12:
+        assert dat.index[0] == datetime(t.year, t.month, t.day)+timedelta(days=1)
+    else:
+        assert dat.index[0] == datetime(t.year, t.month, t.day)
 
     assert 'Ap' in dat
     assert 'f107' in dat
@@ -46,7 +67,7 @@ def test_farfuture():
     dat = gi.get_indices(t, 81)
 
     assert dat.shape == (1, 4)
-    assert dat.index[0] == date(2030, 1, 1)
+    assert dat.index[0] == datetime(2030, 1, 1, 2, 37, 40, 799998)
 
     assert 'Ap' in dat
     assert 'f107' in dat
@@ -56,11 +77,30 @@ def test_farfuture():
 
 def test_list():
 
-    t = [date(2019, 1, 1), datetime(2019, 1, 2)]
+    t = [date(2018, 1, 1), datetime(2018, 1, 2)]
 
     dat = gi.get_indices(t)
 
-    assert (dat.index == date(2019, 1, 1)).all
+    assert (dat.index == [datetime(2018, 1, 1, 1, 30),
+                          datetime(2018, 1, 2, 1, 30)]).all
+
+
+def test_multi_past():
+    dates = pandas.date_range(datetime(2017, 12, 31, 23), datetime(2018, 1, 1, 2),
+                              freq='3H')
+
+    dat = gi.get_indices(dates)
+
+    assert (dat.index == [datetime(2017, 1, 1, 22, 30),
+                          datetime(2018, 1, 1, 1, 30)]).all
+
+
+def test_past_and_future():
+    dates = [datetime(2017, 1, 1), datetime(2030, 3, 1)]
+
+    dat = gi.get_indices(dates)
+
+    dat.index
 
 
 if __name__ == '__main__':

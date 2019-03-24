@@ -1,9 +1,8 @@
 import pandas
-from typing import Union, List
+from typing import Union
 import numpy as np
 from dateutil.parser import parse
 from datetime import datetime, date, timedelta
-import logging
 
 from .web import downloadfile
 from .io import load
@@ -19,7 +18,7 @@ def get_indices(time: Union[str, datetime, date],
     20 year Forecast data from:
     https://sail.msfc.nasa.gov/solar_report_archives/May2016Rpt.pdf
     """
-    dtime = todate(time)
+    dtime = todatetime(time)
 
     fn = downloadfile(dtime, forcedownload)
 # %% load data
@@ -46,6 +45,28 @@ def moving_average(dat, periods: int) -> np.ndarray:
     return np.convolve(dat,
                        np.ones(periods) / periods,
                        mode='same')
+
+
+def todatetime(time: Union[str, date, datetime, np.datetime64]) -> np.ndarray:
+
+    if isinstance(time, str):
+        d = todatetime(parse(time))
+    elif isinstance(time, datetime):
+        d = time
+    elif isinstance(time, np.datetime64):
+        d = time.astype(date)
+    elif isinstance(time, date):
+        d = datetime(time.year, time.month, time.day)
+    elif isinstance(time, (tuple, list, np.ndarray)):
+        d = np.atleast_1d([todatetime(t) for t in time]).squeeze()
+    elif isinstance(time, pandas.DatetimeIndex):
+        d = time.to_pydatetime()
+    else:
+        raise TypeError(f'{time} must be representable as datetime.date')
+
+    dates = np.atleast_1d(d).ravel()
+
+    return dates
 
 
 def todate(time: Union[str, date, datetime, np.datetime64]) -> np.ndarray:

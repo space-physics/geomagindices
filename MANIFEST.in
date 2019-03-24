@@ -2,3 +2,5 @@ include LICENSE
 include pytest.ini
 include .coveragerc
 include geomagindices/data/May2016Rpt.txt
+include tests/2015.png
+include PlotIndices.py GeomagIndices.py
