@@ -2,14 +2,17 @@ from pathlib import Path
 import pandas
 import numpy as np
 from datetime import datetime, timedelta
-from typing import Sequence, Union, List, Iterable
+from typing import List, Iterable, Union
 from dateutil.parser import parse
 
 from .web import URLmonthly, URL45dayfcast, URL20yearfcast
 from .utils import yeardec2datetime
 
 
-def load(flist: Union[Path, Sequence[Path]]) -> pandas.DataFrame:
+def load(flist: Union[Path, Iterable[Path]]) -> pandas.DataFrame:
+    """
+    select data to load and collect into pandas.Dataframe by time
+    """
 
     if isinstance(flist, Path):
         flist = [flist]
@@ -25,12 +28,9 @@ def load(flist: Union[Path, Sequence[Path]]) -> pandas.DataFrame:
         elif fn.name == URL20yearfcast.split('/')[-1].split('.')[0] + '.txt':
             inds.append(read20yearfcast(fn))
         else:
-            raise FileNotFoundError(f'could not determine how to read {fn}')
-# %% concat results
-    if len(inds) == 1:
-        dat = inds[0]
-    else:
-        dat = pandas.concat(inds, sort=True).sort_index()
+            raise OSError(fn)
+
+    dat = pandas.concat(inds, sort=True).sort_index()  # destroys metadata
 
     return dat
 
@@ -69,10 +69,12 @@ def readdaily(flist: Union[Path, Iterable[Path]]) -> pandas.DataFrame:
 # %% build and fill array
     names = ['Ap', 'Kp']
     df = pandas.DataFrame(index=dtime, columns=names)
-    # numpy.genfromtxt to tolerate missing values
+    # tolerate missing values
     df['Ap'] = pandas.to_numeric(rawAp,  errors='coerce')
     df['Kp'] = pandas.to_numeric(rawKp,  errors='coerce')
     df['f107'] = pandas.to_numeric(rawf107,  errors='coerce')
+
+    df['resolution'] = 'd'
 
     return df
 
@@ -89,6 +91,8 @@ def read20yearfcast(fn: Path) -> pandas.DataFrame:
                             index=time,
                             columns=['Ap', 'f107'])
 
+    data['resolution'] = 'm'
+
     return data
 
 
@@ -101,6 +105,8 @@ def readmonthly(fn: Path) -> pandas.DataFrame:
                             columns=['Ap', 'f107'])
 
     data = data.fillna(-1)  # by defn of NOAA
+
+    data['resolution'] = 'm'
 
     return data
 
@@ -132,5 +138,7 @@ def read45dayfcast(fn: Path) -> pandas.DataFrame:
     dat = pandas.DataFrame(data=np.column_stack((Ap, f107)),
                            index=time,
                            columns=['Ap', 'f107'])
+
+    dat['resolution'] = 'w'
 
     return dat

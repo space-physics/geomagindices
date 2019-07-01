@@ -1,5 +1,8 @@
+[![DOI](https://zenodo.org/badge/173524807.svg)](https://zenodo.org/badge/latestdoi/173524807)
+
 [![Build Status](https://travis-ci.com/space-physics/geomagindices.svg?branch=master)](https://travis-ci.com/space-physics/geomagindices)
 [![Coverage Status](https://coveralls.io/repos/github/space-physics/geomagindices/badge.svg?branch=master)](https://coveralls.io/github/space-physics/geomagindices?branch=master)
+[![Build status](https://ci.appveyor.com/api/projects/status/d90excmvet50jnuf?svg=true)](https://ci.appveyor.com/project/scivision/geomagindices)
 [![PyPi version](https://img.shields.io/pypi/pyversions/geomagindices.svg)](https://pypi.python.org/pypi/geomagindices)
 [![PyPi Download stats](http://pepy.tech/badge/geomagindices)](http://pepy.tech/project/geomagindices)
 
