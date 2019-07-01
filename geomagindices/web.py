@@ -38,7 +38,7 @@ def downloadfile(time: np.ndarray, force: bool) -> List[Path]:
             ftp_download(url, fn)
         elif (tnow <= t) & (t < nearfuture):  # near future
             fn = path / URL45dayfcast.split('/')[-1]
-            if force or not exist_ok(fn):
+            if force or not exist_ok(fn, timedelta(days=30)):
                 http_download(URL45dayfcast, fn)
 
             flist.append(fn)
@@ -77,12 +77,18 @@ def ftp_download(url: str, fn: Path):
         raise ConnectionError(f'Could not download {url}')
 
 
-def exist_ok(fn: Path) -> bool:
-    if fn.is_file():
-        finf = fn.stat()
-        return finf.st_size > 1000
+def exist_ok(fn: Path,
+             maxage: timedelta = None) -> bool:
+    if not fn.is_file():
+        return False
 
-    return False
+    ok = True
+    finf = fn.stat()
+    ok &= finf.st_size > 1000
+    if maxage is not None:
+        ok &= datetime.now() - datetime.utcfromtimestamp(finf.st_mtime) <= maxage
+
+    return ok
 
 
 def pdf2text(fn: Path):

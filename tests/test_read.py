@@ -4,9 +4,6 @@ from pytest import approx
 import geomagindices as gi
 from datetime import date, timedelta, datetime
 import pandas
-import os
-
-CI = bool(os.environ.get('CI'))
 
 
 def test_past_date():
@@ -112,7 +109,7 @@ def test_past_and_future():
     except ConnectionError as e:
         pytest.skip(f'possible timeout error {e}')
 
-    dat.index
+    assert (dat.index == [datetime(2017, 1, 1, 1, 30), datetime(2030, 3, 2, 22, 55, 11, 999997)]).all()
 
 
 if __name__ == '__main__':

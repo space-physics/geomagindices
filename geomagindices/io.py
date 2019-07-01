@@ -6,7 +6,7 @@ from typing import Sequence, Union, List, Iterable
 from dateutil.parser import parse
 
 from .web import URLmonthly, URL45dayfcast, URL20yearfcast
-import sciencedates as sd
+from .utils import yeardec2datetime
 
 
 def load(flist: Union[Path, Sequence[Path]]) -> pandas.DataFrame:
@@ -83,7 +83,7 @@ def read20yearfcast(fn: Path) -> pandas.DataFrame:
     """
     dat = np.loadtxt(fn, usecols=(0, 3, 6), skiprows=11)
 
-    time = sd.yeardec2datetime(dat[:, 0])
+    time = yeardec2datetime(dat[:, 0])
 
     data = pandas.DataFrame(data=dat[:, 1:3],
                             index=time,
