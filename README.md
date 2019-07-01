@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.com/scivision/geomagindices.svg?branch=master)](https://travis-ci.com/scivision/geomagindices)
-[![Coverage Status](https://coveralls.io/repos/github/scivision/geomagindices/badge.svg?branch=master)](https://coveralls.io/github/scivision/geomagindices?branch=master)
+[![Build Status](https://travis-ci.com/space-physics/geomagindices.svg?branch=master)](https://travis-ci.com/space-physics/geomagindices)
+[![Coverage Status](https://coveralls.io/repos/github/space-physics/geomagindices/badge.svg?branch=master)](https://coveralls.io/github/space-physics/geomagindices?branch=master)
 [![PyPi version](https://img.shields.io/pypi/pyversions/geomagindices.svg)](https://pypi.python.org/pypi/geomagindices)
 [![PyPi Download stats](http://pepy.tech/badge/geomagindices)](http://pepy.tech/project/geomagindices)
 
@@ -17,6 +17,7 @@ to find nearest time to request.
 ## Examples
 
 use from other programs like
+
 ```python
 import geomagindices as gi
 
