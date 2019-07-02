@@ -13,11 +13,11 @@ URLmonthly = 'ftp://ftp.swpc.noaa.gov/pub/weekly/RecentIndices.txt'
 URLdaily = 'ftp://ftp.ngdc.noaa.gov/STP/GEOMAGNETIC_DATA/INDICES/KP_AP/'
 URL45dayfcast = 'https://services.swpc.noaa.gov/text/45-day-ap-forecast.txt'
 URL20yearfcast = 'https://sail.msfc.nasa.gov/solar_report_archives/May2016Rpt.pdf'
-TIMEOUT = 30  # seconds
+TIMEOUT = 15  # seconds
 
 
 def downloadfile(time: np.ndarray, force: bool) -> List[Path]:
-    path = Path(__file__).parent / 'data'
+    path = Path(__file__).parents[1] / 'data'
 
     time = np.asarray(time)
     tnow = datetime.today()

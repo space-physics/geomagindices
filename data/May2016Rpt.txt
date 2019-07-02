@@ -1,7 +1,7 @@
  extracted from: https://sail.msfc.nasa.gov/solar_report_archives/May2016Rpt.pdf
  with Poppler Utils:
   pdftotext -layout -f 12 -l 15 May2016Rpt.pdf
- 
+
      TABLE 3 ESTIMATES OF 13-MONTH SMOOTHED F10.7 AND Ap FOR
              CYCLE 24 AND CYCLE 25
 
