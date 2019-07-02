@@ -51,14 +51,17 @@ def downloadfile(time: np.ndarray, force: bool) -> List[Path]:
 
 
 def http_download(url: str, fn: Path):
+    if not fn.parent.is_dir():
+        raise NotADirectoryError(fn.parent)
+
     try:
         R = requests.get(url, allow_redirects=True, timeout=TIMEOUT)
         if R.status_code == 200:
             fn.write_text(R.text)
         else:
-            raise ConnectionError(f'Could not download {url}')
+            raise ConnectionError(f'Could not download {url} to {fn}')
     except requests.exceptions.ConnectionError:
-        raise ConnectionError(f'Could not download {url}')
+        raise ConnectionError(f'Could not download {url} to {fn}')
 
 
 def ftp_download(url: str, fn: Path):
@@ -68,6 +71,9 @@ def ftp_download(url: str, fn: Path):
     host = p[1]
     path = '/'.join(p[2].split('/')[:-1])
 
+    if not fn.parent.is_dir():
+        raise NotADirectoryError(fn.parent)
+
     try:
         with ftplib.FTP(host, 'anonymous', 'guest', timeout=TIMEOUT) as F, fn.open('wb') as f:
             F.cwd(path)
@@ -75,7 +81,7 @@ def ftp_download(url: str, fn: Path):
     except (socket.timeout, ftplib.error_perm, socket.gaierror):
         if fn.is_file():  # error while downloading
             fn.unlink()
-        raise ConnectionError(f'Could not download {url}')
+        raise ConnectionError(f'Could not download {url} to {fn}')
 
 
 def exist_ok(fn: Path,
