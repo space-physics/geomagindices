@@ -76,7 +76,8 @@ def test_list():
     except ConnectionError as e:
         pytest.skip(f'possible timeout error {e}')
 
-    assert dat.shape == (2, 4)
+    assert dat.shape[0] == 2
+    assert dat.shape[1] in (3, 4)
 
     assert (dat.index == [datetime(2018, 1, 1, 1, 30),
                           datetime(2018, 1, 2, 1, 30)]).all
