@@ -15,10 +15,15 @@ from datetime import timedelta
 import geomagindices as gi
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from argparse import ArgumentParser
+
     p = ArgumentParser()
-    p.add_argument('start_stop', help='date or date range of observation yyyy-mm-dd  (START, STOP)', nargs='+')
+    p.add_argument(
+        "start_stop",
+        help="date or date range of observation yyyy-mm-dd  (START, STOP)",
+        nargs="+",
+    )
     a = p.parse_args()
 
     start = parse(a.start_stop[0])
@@ -27,16 +32,16 @@ if __name__ == '__main__':
     else:
         end = start + timedelta(days=1)
 
-    dates = pandas.date_range(start, end, freq='3H')
+    dates = pandas.date_range(start, end, freq="3H")
 
     inds = gi.get_indices(dates)
 
-# %% plot
+    # %% plot
     fig = figure()
     ax = fig.gca()
     inds.plot(ax=ax)  # , marker='.'
-    ax.set_ylabel('index values')
-    ax.set_xlabel('time [UTC]')
+    ax.set_ylabel("index values")
+    ax.set_xlabel("time [UTC]")
     ax.grid(True)
 
     # fig.savefig('2015.png', bbox_inches='tight')

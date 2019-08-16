@@ -8,9 +8,11 @@ from .web import downloadfile
 from .io import load
 
 
-def get_indices(time: Union[str, datetime, date],
-                smoothdays: int = None,
-                forcedownload: bool = False) -> pandas.DataFrame:
+def get_indices(
+    time: Union[str, datetime, date],
+    smoothdays: int = None,
+    forcedownload: bool = False,
+) -> pandas.DataFrame:
     """
     alternative going back to 1931:
     ftp://ftp.ngdc.noaa.gov/STP/GEOMAGNETIC_DATA/INDICES/KP_AP/
@@ -21,15 +23,17 @@ def get_indices(time: Union[str, datetime, date],
     dtime = todatetime(time)
 
     fn = downloadfile(dtime, forcedownload)
-# %% load data
+    # %% load data
     dat = load(fn)
-# %% optional smoothing over days
+    # %% optional smoothing over days
     if isinstance(smoothdays, int):
-        periods = np.rint(timedelta(days=smoothdays) / (dat.index[1] - dat.index[0])).astype(int)
-        dat['f107s'] = moving_average(dat['f107'], periods)
-        dat['Aps'] = moving_average(dat['Ap'], periods)
-# %% pull out the times we want
-    i = [dat.index.get_loc(t, method='nearest') for t in dtime]
+        periods = np.rint(
+            timedelta(days=smoothdays) / (dat.index[1] - dat.index[0])
+        ).astype(int)
+        dat["f107s"] = moving_average(dat["f107"], periods)
+        dat["Aps"] = moving_average(dat["Ap"], periods)
+    # %% pull out the times we want
+    i = [dat.index.get_loc(t, method="nearest") for t in dtime]
     Indices = dat.iloc[i, :]
 
     return Indices
@@ -40,11 +44,9 @@ getApF107 = get_indices  # legacy
 
 def moving_average(dat, periods: int) -> np.ndarray:
     if periods > dat.size:
-        raise ValueError('cannot smooth over more time periods than exist in the data')
+        raise ValueError("cannot smooth over more time periods than exist in the data")
 
-    return np.convolve(dat,
-                       np.ones(periods) / periods,
-                       mode='same')
+    return np.convolve(dat, np.ones(periods) / periods, mode="same")
 
 
 def todatetime(time: Union[str, date, datetime, np.datetime64]) -> np.ndarray:
@@ -62,7 +64,7 @@ def todatetime(time: Union[str, date, datetime, np.datetime64]) -> np.ndarray:
     elif isinstance(time, pandas.DatetimeIndex):
         d = time.to_pydatetime()
     else:
-        raise TypeError(f'{time} must be representable as datetime.date')
+        raise TypeError(f"{time} must be representable as datetime.date")
 
     dates = np.atleast_1d(d).ravel()
 
@@ -82,7 +84,7 @@ def todate(time: Union[str, date, datetime, np.datetime64]) -> np.ndarray:
     elif isinstance(time, (tuple, list, np.ndarray)):
         d = np.atleast_1d([todate(t) for t in time]).squeeze()
     else:
-        raise TypeError(f'{time} must be representable as datetime.date')
+        raise TypeError(f"{time} must be representable as datetime.date")
 
     dates = np.atleast_1d(d).ravel()
 
