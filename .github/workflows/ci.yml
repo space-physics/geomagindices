@@ -1,0 +1,45 @@
+name: ci_python
+
+on: [push, pull_request]
+
+jobs:
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-python@v1
+      with:
+        python-version: '3.x'
+    - run: pip install -e .[lint]
+    - run: flake8
+    - run: mypy .
+
+  integration:
+    needs: [lint]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-python@v1
+      with:
+        python-version: '3.x'
+    - run: pip install -e .[tests]
+    - run: pytest -r a -v
+
+  install:
+    needs: [integration]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/setup-python@v1
+      with:
+        python-version: '3.x'
+    - run: python setup.py install
+    - name: install test
+      run: |
+        cd ${HOME}
+        python -m pip install pytest python-dateutil requests numpy pandas
+        python -m pytest ${GITHUB_WORKSPACE} -r a -v

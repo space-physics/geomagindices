@@ -8,11 +8,7 @@ from .web import downloadfile
 from .io import load
 
 
-def get_indices(
-    time: Union[str, datetime, date],
-    smoothdays: int = None,
-    forcedownload: bool = False,
-) -> pandas.DataFrame:
+def get_indices(time: Union[str, datetime, date], smoothdays: int = None, forcedownload: bool = False) -> pandas.DataFrame:
     """
     alternative going back to 1931:
     ftp://ftp.ngdc.noaa.gov/STP/GEOMAGNETIC_DATA/INDICES/KP_AP/
@@ -27,9 +23,7 @@ def get_indices(
     dat = load(fn)
     # %% optional smoothing over days
     if isinstance(smoothdays, int):
-        periods = np.rint(
-            timedelta(days=smoothdays) / (dat.index[1] - dat.index[0])
-        ).astype(int)
+        periods = np.rint(timedelta(days=smoothdays) / (dat.index[1] - dat.index[0])).astype(int)
         dat["f107s"] = moving_average(dat["f107"], periods)
         dat["Aps"] = moving_average(dat["Ap"], periods)
     # %% pull out the times we want

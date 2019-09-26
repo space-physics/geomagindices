@@ -19,11 +19,7 @@ if __name__ == "__main__":
     from argparse import ArgumentParser
 
     p = ArgumentParser()
-    p.add_argument(
-        "start_stop",
-        help="date or date range of observation yyyy-mm-dd  (START, STOP)",
-        nargs="+",
-    )
+    p.add_argument("start_stop", help="date or date range of observation yyyy-mm-dd  (START, STOP)", nargs="+")
     a = p.parse_args()
 
     start = parse(a.start_stop[0])

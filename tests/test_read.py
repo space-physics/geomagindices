@@ -7,11 +7,7 @@ import pandas
 
 
 @pytest.mark.parametrize(
-    "dt,hour,f107s,ap,aps",
-    [
-        (date(2017, 5, 1), 1, 78.430, 9, 10.43),
-        (datetime(2017, 5, 1, 12), 13, 78.47, 2, 10.241),
-    ],
+    "dt,hour,f107s,ap,aps", [(date(2017, 5, 1), 1, 78.430, 9, 10.43), (datetime(2017, 5, 1, 12), 13, 78.47, 2, 10.241)]
 )
 def test_past(dt, hour, f107s, ap, aps):
 
@@ -87,18 +83,14 @@ def test_list():
 
 
 def test_multi_past():
-    dates = pandas.date_range(
-        datetime(2017, 12, 31, 23), datetime(2018, 1, 1, 2), freq="3H"
-    )
+    dates = pandas.date_range(datetime(2017, 12, 31, 23), datetime(2018, 1, 1, 2), freq="3H")
 
     try:
         dat = gi.get_indices(dates)
     except ConnectionError as e:
         pytest.skip(f"possible timeout error {e}")
 
-    assert (
-        dat.index == [datetime(2017, 1, 1, 22, 30), datetime(2018, 1, 1, 1, 30)]
-    ).all
+    assert (dat.index == [datetime(2017, 1, 1, 22, 30), datetime(2018, 1, 1, 1, 30)]).all
 
 
 def test_past_and_future():

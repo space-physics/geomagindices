@@ -39,26 +39,8 @@ def load(flist: Union[Path, Iterable[Path]]) -> pandas.DataFrame:
 
 
 def readdaily(flist: Union[Path, Iterable[Path]]) -> pandas.DataFrame:
-    kp_cols = [
-        (12, 14),
-        (14, 16),
-        (16, 18),
-        (18, 20),
-        (20, 22),
-        (22, 24),
-        (24, 26),
-        (26, 28),
-    ]
-    ap_cols = [
-        (31, 34),
-        (34, 37),
-        (37, 40),
-        (40, 43),
-        (43, 46),
-        (46, 49),
-        (49, 52),
-        (52, 55),
-    ]
+    kp_cols = [(12, 14), (14, 16), (16, 18), (18, 20), (20, 22), (22, 24), (24, 26), (26, 28)]
+    ap_cols = [(31, 34), (34, 37), (37, 40), (40, 43), (43, 46), (46, 49), (49, 52), (52, 55)]
     f107_cols = (65, 70)
 
     rawAp: List[str] = []
@@ -73,12 +55,8 @@ def readdaily(flist: Union[Path, Iterable[Path]]) -> pandas.DataFrame:
         with fn.open() as f:
             for line in f:
                 # FIXME: century ambiguity of original data
-                year = (
-                    2000 + int(line[:2]) if int(line[:2]) < 38 else 1900 + int(line[:2])
-                )
-                days.append(
-                    datetime(year=year, month=int(line[2:4]), day=int(line[4:6]))
-                )
+                year = 2000 + int(line[:2]) if int(line[:2]) < 38 else 1900 + int(line[:2])
+                days.append(datetime(year=year, month=int(line[2:4]), day=int(line[4:6])))
                 rawAp += [line[i[0]: i[1]] for i in ap_cols]
                 rawKp += [line[i[0]: i[1]] for i in kp_cols]
 
@@ -86,11 +64,7 @@ def readdaily(flist: Union[Path, Iterable[Path]]) -> pandas.DataFrame:
                 # MUCH faster to generate here than to fill after DF generation
                 rawf107 += [line[f107_cols[0]: f107_cols[1]]] * 8
     # %% construct time
-    dtime = [
-        day + timedelta(minutes=m)
-        for day in days
-        for m in range(90, 24 * 60 + 90, 3 * 60)
-    ]
+    dtime = [day + timedelta(minutes=m) for day in days for m in range(90, 24 * 60 + 90, 3 * 60)]
     # %% build and fill array
     names = ["Ap", "Kp"]
     df = pandas.DataFrame(index=dtime, columns=names)
@@ -123,9 +97,7 @@ def readmonthly(fn: Path) -> pandas.DataFrame:
     dat = np.loadtxt(fn, comments=("#", ":"), usecols=(0, 1, 7, 8, 9, 10))
     date = [parse(f"{ym[0]:.0f}-{ym[1]:02.0f}-01") for ym in dat[:, :2]]
 
-    data = pandas.DataFrame(
-        np.column_stack((dat[:, 4], dat[:, 2])), index=date, columns=["Ap", "f107"]
-    )
+    data = pandas.DataFrame(np.column_stack((dat[:, 4], dat[:, 2])), index=date, columns=["Ap", "f107"])
 
     data = data.fillna(-1)  # by defn of NOAA
 
@@ -158,9 +130,7 @@ def read45dayfcast(fn: Path) -> pandas.DataFrame:
             time += [parse(t) for t in ls[::2]]
             f107 += [float(a) for a in ls[1::2]]
 
-    dat = pandas.DataFrame(
-        data=np.column_stack((Ap, f107)), index=time, columns=["Ap", "f107"]
-    )
+    dat = pandas.DataFrame(data=np.column_stack((Ap, f107)), index=time, columns=["Ap", "f107"])
 
     dat["resolution"] = "w"
 

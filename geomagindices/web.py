@@ -19,9 +19,7 @@ TIMEOUT = 15  # seconds
 
 def downloadfile(time: np.ndarray, force: bool) -> List[Path]:
     # path = Path(__file__).parents[1] / 'data'  # doesn't always work from virtualenv e.g. Travis-CI
-    path = (
-        Path(pkg_resources.resource_filename(__name__, "__init__.py")).parent / "data"
-    )
+    path = Path(pkg_resources.resource_filename(__name__, "__init__.py")).parent / "data"
     if not path.is_dir():
         raise NotADirectoryError(path)
 
@@ -81,9 +79,7 @@ def ftp_download(url: str, fn: Path):
         raise NotADirectoryError(fn.parent)
 
     try:
-        with ftplib.FTP(host, "anonymous", "guest", timeout=TIMEOUT) as F, fn.open(
-            "wb"
-        ) as f:
+        with ftplib.FTP(host, "anonymous", "guest", timeout=TIMEOUT) as F, fn.open("wb") as f:
             F.cwd(path)
             F.retrbinary(f"RETR {fn.name}", f.write)
     except (socket.timeout, ftplib.error_perm, socket.gaierror):
