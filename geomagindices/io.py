@@ -70,7 +70,9 @@ def readdaily(flist: Union[Path, Iterable[Path]]) -> pandas.DataFrame:
     df = pandas.DataFrame(index=dtime, columns=names)
     # tolerate missing values
     df["Ap"] = pandas.to_numeric(rawAp, errors="coerce")
-    df["Kp"] = pandas.to_numeric(rawKp, errors="coerce")
+
+    # Kp / 10 as per ftp://ftp.ngdc.noaa.gov/STP/GEOMAGNETIC_DATA/INDICES/KP_AP/kp_ap.fmt  (github issue #2)
+    df["Kp"] = pandas.to_numeric(rawKp, errors="coerce") / 10.
     df["f107"] = pandas.to_numeric(rawf107, errors="coerce")
 
     df["resolution"] = "d"

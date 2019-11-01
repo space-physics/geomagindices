@@ -7,9 +7,9 @@ import pandas
 
 
 @pytest.mark.parametrize(
-    "dt,hour,f107s,ap,aps", [(date(2017, 5, 1), 1, 78.430, 9, 10.43), (datetime(2017, 5, 1, 12), 13, 78.47, 2, 10.241)]
+    "dt,hour,f107s,ap,aps,kp", [(date(2017, 5, 1), 1, 78.430, 9, 10.43, 2.3), (datetime(2017, 5, 1, 12), 13, 78.47, 2, 10.241, 0.3)]
 )
-def test_past(dt, hour, f107s, ap, aps):
+def test_past(dt, hour, f107s, ap, aps, kp):
 
     try:
         dat = gi.get_indices(dt, 81)
@@ -17,17 +17,17 @@ def test_past(dt, hour, f107s, ap, aps):
         pytest.skip(f"possible timeout error {e}")
 
     assert dat.shape[0] == 1
-    if dat["resolution"].item() == "m":
-        assert dat["f107"].item() == approx(73.5, abs=0.1)
-        assert dat["f107s"].item() == approx(76.4, abs=0.1)
-        assert dat["Ap"].item() == 9
-        assert dat["Aps"].item() == approx(9.66, abs=0.1)
-    elif dat["resolution"].item() == "d":
-        assert dat["f107"].item() == approx(76.4)
-
-        assert dat["f107s"].item() == approx(f107s, abs=0.1)
-        assert dat["Ap"].item() == ap
-        assert dat["Aps"].item() == approx(aps, abs=0.1)
+    if dat["resolution"].iloc[0] == "m":
+        assert dat["f107"].iloc[0] == approx(73.5, abs=0.1)
+        assert dat["f107s"].iloc[0] == approx(76.4, abs=0.1)
+        assert dat["Ap"].iloc[0] == 9
+        assert dat["Aps"].iloc[0] == approx(9.66, abs=0.1)
+    elif dat["resolution"].iloc[0] == "d":
+        assert dat["f107"].iloc[0] == approx(76.4)
+        assert dat["f107s"].iloc[0] == approx(f107s, abs=0.1)
+        assert dat["Ap"].iloc[0] == ap
+        assert dat["Aps"].iloc[0] == approx(aps, abs=0.1)
+        assert dat["Kp"].iloc[0] == approx(kp, abs=0.1)
     else:
         raise ValueError(f"unknown resolution {dat.resolution}")
 
@@ -109,4 +109,4 @@ def test_past_and_future():
 
 
 if __name__ == "__main__":
-    pytest.main(["-x", __file__])
+    pytest.main([__file__])
