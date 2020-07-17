@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 import pytest
 from pytest import approx
-import geomagindices as gi
 from datetime import date, timedelta, datetime
 import pandas
+
+import geomagindices as gi
 
 
 @pytest.mark.parametrize(

@@ -2,10 +2,11 @@
 """
 simple demo of retrieving common geomagnetic indices by date
 """
-import geomagindices as gi
+
+from .base import get_indices
 
 
-if __name__ == "__main__":
+def cli():
     from argparse import ArgumentParser
 
     p = ArgumentParser()
@@ -13,6 +14,6 @@ if __name__ == "__main__":
     p.add_argument("-s", "--smoothdays", help="days to smooth observation for f107a", type=int)
     a = p.parse_args()
 
-    inds = gi.get_indices(a.date, a.smoothdays)
+    inds = get_indices(a.date, a.smoothdays)
 
     print(inds)

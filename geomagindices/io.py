@@ -57,12 +57,12 @@ def readdaily(flist: Union[Path, Iterable[Path]]) -> pandas.DataFrame:
                 # FIXME: century ambiguity of original data
                 year = 2000 + int(line[:2]) if int(line[:2]) < 38 else 1900 + int(line[:2])
                 days.append(datetime(year=year, month=int(line[2:4]), day=int(line[4:6])))
-                rawAp += [line[i[0]: i[1]] for i in ap_cols]
-                rawKp += [line[i[0]: i[1]] for i in kp_cols]
+                rawAp += [line[i[0] : i[1]] for i in ap_cols]
+                rawKp += [line[i[0] : i[1]] for i in kp_cols]
 
                 # f10.7 is daily index
                 # MUCH faster to generate here than to fill after DF generation
-                rawf107 += [line[f107_cols[0]: f107_cols[1]]] * 8
+                rawf107 += [line[f107_cols[0] : f107_cols[1]]] * 8
     # %% construct time
     dtime = [day + timedelta(minutes=m) for day in days for m in range(90, 24 * 60 + 90, 3 * 60)]
     # %% build and fill array
@@ -72,7 +72,7 @@ def readdaily(flist: Union[Path, Iterable[Path]]) -> pandas.DataFrame:
     df["Ap"] = pandas.to_numeric(rawAp, errors="coerce")
 
     # Kp / 10 as per ftp://ftp.ngdc.noaa.gov/STP/GEOMAGNETIC_DATA/INDICES/KP_AP/kp_ap.fmt  (github issue #2)
-    df["Kp"] = pandas.to_numeric(rawKp, errors="coerce") / 10.
+    df["Kp"] = pandas.to_numeric(rawKp, errors="coerce") / 10.0
     df["f107"] = pandas.to_numeric(rawf107, errors="coerce")
 
     df["resolution"] = "d"

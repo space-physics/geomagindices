@@ -1,16 +1,16 @@
+# Geomagnetic Indices
+
 [![DOI](https://zenodo.org/badge/173524807.svg)](https://zenodo.org/badge/latestdoi/173524807)
-
-[![Actions Status](https://github.com/space-physics/geomagindices/workflows/ci_python/badge.svg)](https://github.com/space-physics/geomagindices/actions)
-
+![Actions Status](https://github.com/space-physics/geomagindices/workflows/ci_python/badge.svg)
 [![PyPi version](https://img.shields.io/pypi/pyversions/geomagindices.svg)](https://pypi.python.org/pypi/geomagindices)
 [![PyPi Download stats](http://pepy.tech/badge/geomagindices)](http://pepy.tech/project/geomagindices)
 
-
-# Geomagnetic Indices
 Geomagnetic indices downloader and parser, returns Ap, F10.7 (unsmoothed and smoothed) and Kp.
 Let us know via GitHub Issue if something is missing.
 
-Output datatype is [pandas.DataFrame](http://pandas.pydata.org/pandas-docs/stable/reference/frame.html) (for multiple times)
+Output datatype is
+[pandas.DataFrame](http://pandas.pydata.org/pandas-docs/stable/reference/frame.html)
+(for multiple times)
 
 internally, uses
 [pandas.Index.get_loc](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Index.get_loc.html)
@@ -32,7 +32,7 @@ where date is Python
 ---
 
 ```sh
-python PlotIndices.py 2015-01-01 2016-01-01
+python Examples/PlotIndices.py 2015-01-01 2016-01-01
 ```
 
 ![2015 Ap F10.7](./tests/2015.png)
