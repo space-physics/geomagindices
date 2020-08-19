@@ -8,7 +8,7 @@ from typing import List
 import socket
 import requests.exceptions
 import numpy as np
-import pkg_resources
+import importlib.resources
 
 URLmonthly = "ftp://ftp.swpc.noaa.gov/pub/weekly/RecentIndices.txt"
 URLdaily = "ftp://ftp.ngdc.noaa.gov/STP/GEOMAGNETIC_DATA/INDICES/KP_AP/"
@@ -18,10 +18,11 @@ TIMEOUT = 15  # seconds
 
 
 def downloadfile(time: np.ndarray, force: bool) -> List[Path]:
-    # path = Path(__file__).parents[1] / 'data'  # doesn't always work from virtualenv e.g. Travis-CI
-    path = Path(pkg_resources.resource_filename(__name__, "__init__.py")).parent / "data"
-    if not path.is_dir():
-        raise NotADirectoryError(path)
+
+    with importlib.resources.path(__package__, "__init__.py") as fn:
+        path = fn.parent / "data"
+        if not path.is_dir():
+            raise NotADirectoryError(path)
 
     time = np.asarray(time)
     tnow = datetime.today()
