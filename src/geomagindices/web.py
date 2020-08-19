@@ -10,7 +10,7 @@ import requests.exceptions
 import numpy as np
 import importlib.resources
 
-URLmonthly = "ftp://ftp.swpc.noaa.gov/pub/weekly/RecentIndices.txt"
+URLmonthly = "https://services.swpc.noaa.gov/json/solar-cycle/observed-solar-cycle-indices.json"
 URLdaily = "ftp://ftp.ngdc.noaa.gov/STP/GEOMAGNETIC_DATA/INDICES/KP_AP/"
 URL45dayfcast = "https://services.swpc.noaa.gov/text/45-day-ap-forecast.txt"
 URL20yearfcast = "https://sail.msfc.nasa.gov/solar_report_archives/May2016Rpt.pdf"
@@ -39,7 +39,7 @@ def downloadfile(time: np.ndarray, force: bool) -> List[Path]:
                 except ConnectionError:  # backup, lower resolution
                     fn = path / URLmonthly.split("/")[-1]
                     if not exist_ok(fn, timedelta(days=30)):
-                        ftp_download(URLmonthly, fn)
+                        http_download(URLmonthly, fn)
             flist.append(fn)
         elif (tnow <= t) & (t < nearfuture):  # near future
             fn = path / URL45dayfcast.split("/")[-1]

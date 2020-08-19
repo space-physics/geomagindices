@@ -24,8 +24,10 @@ def get_indices(time: Union[str, datetime, date], smoothdays: int = None, forced
     # %% optional smoothing over days
     if isinstance(smoothdays, int):
         periods = np.rint(timedelta(days=smoothdays) / (dat.index[1] - dat.index[0])).astype(int)
-        dat["f107s"] = moving_average(dat["f107"], periods)
-        dat["Aps"] = moving_average(dat["Ap"], periods)
+        if "f107" in dat:
+            dat["f107s"] = moving_average(dat["f107"], periods)
+        if "Ap" in dat:
+            dat["Aps"] = moving_average(dat["Ap"], periods)
     # %% pull out the times we want
     i = [dat.index.get_loc(t, method="nearest") for t in dtime]
     Indices = dat.iloc[i, :]

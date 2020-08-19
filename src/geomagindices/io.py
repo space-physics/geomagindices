@@ -96,12 +96,13 @@ def read20yearfcast(fn: Path) -> pandas.DataFrame:
 
 
 def readmonthly(fn: Path) -> pandas.DataFrame:
-    dat = np.loadtxt(fn, comments=("#", ":"), usecols=(0, 1, 7, 8, 9, 10))
-    date = [parse(f"{ym[0]:.0f}-{ym[1]:02.0f}-01") for ym in dat[:, :2]]
+    dat = pandas.read_json(fn)
+    date = [datetime(int(ym[:4]), int(ym[5:7]), 1) for ym in dat["time-tag"]]
 
-    data = pandas.DataFrame(np.column_stack((dat[:, 4], dat[:, 2])), index=date, columns=["Ap", "f107"])
+    data = pandas.DataFrame(index=date)
+    data["f107"] = dat["f10.7"].values
 
-    data = data.fillna(-1)  # by defn of NOAA
+    data[data < 0] = np.nan  # by defn of NOAA
 
     data["resolution"] = "m"
 
