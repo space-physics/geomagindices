@@ -10,7 +10,10 @@ import requests.exceptions
 import numpy as np
 import importlib.resources
 
-URLmonthly = "https://services.swpc.noaa.gov/json/solar-cycle/observed-solar-cycle-indices.json"
+URLmonthly = {
+    "f107": "https://services.swpc.noaa.gov/json/solar-cycle/observed-solar-cycle-indices.json",
+    "Ap": "ftp://ftp.gfz-potsdam.de/pub/home/obs/kp-ap/ap_monyr.ave",
+}
 URLdaily = "ftp://ftp.ngdc.noaa.gov/STP/GEOMAGNETIC_DATA/INDICES/KP_AP/"
 URL45dayfcast = "https://services.swpc.noaa.gov/text/45-day-ap-forecast.txt"
 URL20yearfcast = "https://sail.msfc.nasa.gov/solar_report_archives/May2016Rpt.pdf"
@@ -35,16 +38,21 @@ def downloadfile(time: np.ndarray, force: bool) -> List[Path]:
             fn = path / f"{t.year}"
             if force or not exist_ok(fn):
                 try:
-                    ftp_download(url, fn)
+                    download(url, fn)
+                    flist.append(fn)
                 except ConnectionError:  # backup, lower resolution
-                    fn = path / URLmonthly.split("/")[-1]
-                    if not exist_ok(fn, timedelta(days=30)):
-                        http_download(URLmonthly, fn)
-            flist.append(fn)
+                    for url in URLmonthly.values():
+                        fn = path / url.split("/")[-1]
+                        flist.append(fn)
+                        if not exist_ok(fn, timedelta(days=30)):
+                            download(url, fn)
+            else:
+                flist.append(fn)
+
         elif (tnow <= t) & (t < nearfuture):  # near future
             fn = path / URL45dayfcast.split("/")[-1]
             if force or not exist_ok(fn, timedelta(days=1)):
-                http_download(URL45dayfcast, fn)
+                download(URL45dayfcast, fn)
 
             flist.append(fn)
         elif t > nearfuture:  # future
@@ -53,6 +61,16 @@ def downloadfile(time: np.ndarray, force: bool) -> List[Path]:
             raise ValueError(f"Raise a GitHub issue if this is a problem  {t}")
 
     return list(set(flist))  # dedupe
+
+
+def download(url: str, fn: Path):
+
+    if url.startswith("http"):
+        http_download(url, fn)
+    elif url.startswith("ftp"):
+        ftp_download(url, fn)
+    else:
+        raise ValueError(f"not sure how to download {url}")
 
 
 def http_download(url: str, fn: Path):

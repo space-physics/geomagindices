@@ -1,15 +1,15 @@
 from pathlib import Path
 import pandas
 import numpy as np
+import typing as T
 from datetime import datetime, timedelta
-from typing import List, Iterable, Union
 from dateutil.parser import parse
 
 from .web import URLmonthly, URL45dayfcast, URL20yearfcast
 from .utils import yeardec2datetime
 
 
-def load(flist: Union[Path, Iterable[Path]]) -> pandas.DataFrame:
+def load(flist: T.Union[Path, T.Iterable[Path]]) -> pandas.DataFrame:
     """
     select data to load and collect into pandas.Dataframe by time
     """
@@ -17,18 +17,24 @@ def load(flist: Union[Path, Iterable[Path]]) -> pandas.DataFrame:
     if isinstance(flist, Path):
         flist = [flist]
 
+    monthly_data = pandas.DataFrame(columns=["Ap", "f107"])
     inds = []
     for fn in flist:
         if len(fn.name) == 4:
             inds.append(readdaily(fn))
-        elif fn.name == URLmonthly.split("/")[-1]:
-            inds.append(readmonthly(fn))
+        elif fn.name == URLmonthly["f107"].split("/")[-1]:
+            monthly_data["f107"] = read_monthly(fn)
+        elif fn.name == URLmonthly["Ap"].split("/")[-1]:
+            monthly_data["Ap"] = read_monthly(fn)
         elif fn.name == URL45dayfcast.split("/")[-1]:
             inds.append(read45dayfcast(fn))
         elif fn.name == URL20yearfcast.split("/")[-1].split(".")[0] + ".txt":
             inds.append(read20yearfcast(fn))
         else:
             raise OSError(fn)
+
+    if monthly_data.size > 0:
+        inds.append(monthly_data)
 
     dat = pandas.concat(inds, sort=True).sort_index()  # destroys metadata
 
@@ -38,14 +44,14 @@ def load(flist: Union[Path, Iterable[Path]]) -> pandas.DataFrame:
 # not lru_cache b/c list[path]
 
 
-def readdaily(flist: Union[Path, Iterable[Path]]) -> pandas.DataFrame:
+def readdaily(flist: T.Union[Path, T.Iterable[Path]]) -> pandas.DataFrame:
     kp_cols = [(12, 14), (14, 16), (16, 18), (18, 20), (20, 22), (22, 24), (24, 26), (26, 28)]
     ap_cols = [(31, 34), (34, 37), (37, 40), (40, 43), (43, 46), (46, 49), (49, 52), (52, 55)]
     f107_cols = (65, 70)
 
-    rawAp: List[str] = []
-    rawKp: List[str] = []
-    rawf107: List[str] = []
+    rawAp: T.List[str] = []
+    rawKp: T.List[str] = []
+    rawf107: T.List[str] = []
     days = []
 
     if isinstance(flist, Path):
@@ -95,22 +101,30 @@ def read20yearfcast(fn: Path) -> pandas.DataFrame:
     return data
 
 
-def readmonthly(fn: Path) -> pandas.DataFrame:
-    dat = pandas.read_json(fn)
-    date = [datetime(int(ym[:4]), int(ym[5:7]), 1) for ym in dat["time-tag"]]
+def read_monthly(file: Path) -> pandas.Series:
 
-    data = pandas.DataFrame(index=date)
-    data["f107"] = dat["f10.7"].values
+    if file.suffix == ".json":
+        dat = pandas.read_json(file)
 
-    data[data < 0] = np.nan  # by defn of NOAA
+        date = [datetime(int(ym[:4]), int(ym[5:7]), 1) for ym in dat["time-tag"]]
+        data = pandas.Series(index=date, data=dat["f10.7"].values)
+    elif file.suffix == ".ave":
+        dat = np.genfromtxt(file, usecols=range(1, 14), missing_values=".")
 
-    data["resolution"] = "m"
+        date = []
+        for year in dat[:, 0]:
+            for month in range(1, 13):
+                date.append(datetime(int(year), month, 1))
+
+        data = pandas.Series(index=date, data=dat[:, 1:].ravel())
+
+    data[data < 0] = np.nan  # by NOAA definition
 
     return data
 
 
 def read45dayfcast(fn: Path) -> pandas.DataFrame:
-    Ap: List[int] = []
+    Ap: T.List[int] = []
 
     with fn.open("r") as f:
         for line in f:
@@ -123,8 +137,8 @@ def read45dayfcast(fn: Path) -> pandas.DataFrame:
             # time += [parse(t) for t in ls[::2]]  # duplicate of below
             Ap += [int(a) for a in ls[1::2]]
         # %% F10.7
-        time: List[datetime] = []
-        f107: List[float] = []
+        time: T.List[datetime] = []
+        f107: T.List[float] = []
         for line in f:
             if line.startswith("FORECASTER"):
                 break

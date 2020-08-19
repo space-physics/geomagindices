@@ -11,7 +11,7 @@ import geomagindices as gi
     [
         (date(2017, 5, 1), 1, 76.4, 78.43, 9, 10.44, 2.3),
         (datetime(2017, 5, 1, 12), 13, 76.4, 78.47, 2, 10.241, 0.3),
-        (datetime(2020, 3, 31, 12), 1, 69.55, 69.65, -1, -1, -1),
+        (datetime(2020, 3, 31, 12), 1, 69.55, 69.65, 5, 5, -1),
     ],
 )
 def test_past(dt, hour, f107, f107s, ap, aps, kp):
@@ -24,9 +24,8 @@ def test_past(dt, hour, f107, f107s, ap, aps, kp):
     assert dat.shape[0] == 1
     assert dat["f107"].iloc[0] == approx(f107, abs=0.1)
     assert dat["f107s"].iloc[0] == approx(f107s, abs=0.1)
-    if "Ap" in dat:
-        assert dat["Ap"].iloc[0] == ap
-        assert dat["Aps"].iloc[0] == approx(aps, abs=0.1)
+    assert dat["Ap"].iloc[0] == ap
+    assert dat["Aps"].iloc[0] == approx(aps, abs=0.1)
     if "Kp" in dat:
         assert dat["Kp"].iloc[0] == approx(kp, abs=0.1)
 
