@@ -23,14 +23,16 @@ def get_indices(
 
     fn = downloadfile(dtime, forcedownload)
     # %% load data
-    dat = load(fn)
+    dat: pandas.DataFrame = load(fn)
     # %% optional smoothing over days
     if isinstance(smoothdays, int):
         periods = np.rint(timedelta(days=smoothdays) / (dat.index[1] - dat.index[0])).astype(int)
+
         if "f107" in dat:
-            dat["f107s"] = moving_average(dat["f107"], periods)
+            dat["f107s"] = dat["f107"].rolling(periods, min_periods=1).mean()
         if "Ap" in dat:
-            dat["Aps"] = moving_average(dat["Ap"], periods)
+            dat["Aps"] = dat["Ap"].rolling(periods, min_periods=1).mean()
+
     # %% pull out the times we want
     i = [dat.index.get_loc(t, method="nearest") for t in dtime]
     Indices = dat.iloc[i, :]
@@ -41,7 +43,8 @@ def get_indices(
 getApF107 = get_indices  # legacy
 
 
-def moving_average(dat, periods: int) -> np.ndarray:
+def moving_average(dat: pandas.Series, periods: int) -> np.ndarray:
+
     if periods > dat.size:
         raise ValueError("cannot smooth over more time periods than exist in the data")
 
