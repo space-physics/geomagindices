@@ -1,7 +1,7 @@
+from __future__ import annotations
 from pathlib import Path
 import pandas
 import numpy as np
-import typing as T
 from datetime import datetime, timedelta
 from dateutil.parser import parse
 
@@ -9,7 +9,7 @@ from .web import URLmonthly, URL45dayfcast, URL20yearfcast
 from .utils import yeardec2datetime
 
 
-def load(flist: T.Union[Path, T.Iterable[Path]]) -> pandas.DataFrame:
+def load(flist: Path | list[Path]) -> pandas.DataFrame:
     """
     select data to load and collect into pandas.Dataframe by time
     """
@@ -44,14 +44,14 @@ def load(flist: T.Union[Path, T.Iterable[Path]]) -> pandas.DataFrame:
 # not lru_cache b/c list[path]
 
 
-def readdaily(flist: T.Union[Path, T.Iterable[Path]]) -> pandas.DataFrame:
+def readdaily(flist: Path | list[Path]) -> pandas.DataFrame:
     kp_cols = [(12, 14), (14, 16), (16, 18), (18, 20), (20, 22), (22, 24), (24, 26), (26, 28)]
     ap_cols = [(31, 34), (34, 37), (37, 40), (40, 43), (43, 46), (46, 49), (49, 52), (52, 55)]
     f107_cols = (65, 70)
 
-    rawAp: T.List[str] = []
-    rawKp: T.List[str] = []
-    rawf107: T.List[str] = []
+    rawAp: list[str] = []
+    rawKp: list[str] = []
+    rawf107: list[str] = []
     days = []
 
     if isinstance(flist, Path):
@@ -124,7 +124,7 @@ def read_monthly(file: Path) -> pandas.Series:
 
 
 def read45dayfcast(fn: Path) -> pandas.DataFrame:
-    Ap: T.List[int] = []
+    Ap: list[int] = []
 
     with fn.open("r") as f:
         for line in f:
@@ -137,8 +137,8 @@ def read45dayfcast(fn: Path) -> pandas.DataFrame:
             # time += [parse(t) for t in ls[::2]]  # duplicate of below
             Ap += [int(a) for a in ls[1::2]]
         # %% F10.7
-        time: T.List[datetime] = []
-        f107: T.List[float] = []
+        time: list[datetime] = []
+        f107: list[float] = []
         for line in f:
             if line.startswith("FORECASTER"):
                 break

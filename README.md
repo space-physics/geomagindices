@@ -1,7 +1,7 @@
 # Geomagnetic Indices
 
 [![DOI](https://zenodo.org/badge/173524807.svg)](https://zenodo.org/badge/latestdoi/173524807)
-![Actions Status](https://github.com/space-physics/geomagindices/workflows/ci_python/badge.svg)
+![Actions Status](https://github.com/space-physics/geomagindices/workflows/ci/badge.svg)
 [![PyPi version](https://img.shields.io/pypi/pyversions/geomagindices.svg)](https://pypi.python.org/pypi/geomagindices)
 [![PyPi Download stats](http://pepy.tech/badge/geomagindices)](http://pepy.tech/project/geomagindices)
 

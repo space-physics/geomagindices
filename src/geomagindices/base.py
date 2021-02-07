@@ -1,5 +1,6 @@
+from __future__ import annotations
+import typing
 import pandas
-from typing import Union
 import numpy as np
 from dateutil.parser import parse
 from datetime import datetime, date, timedelta
@@ -8,7 +9,9 @@ from .web import downloadfile
 from .io import load
 
 
-def get_indices(time: Union[str, datetime, date], smoothdays: int = None, forcedownload: bool = False) -> pandas.DataFrame:
+def get_indices(
+    time: str | datetime | date, smoothdays: int = None, forcedownload: bool = False
+) -> pandas.DataFrame:
     """
     alternative going back to 1931:
     ftp://ftp.ngdc.noaa.gov/STP/GEOMAGNETIC_DATA/INDICES/KP_AP/
@@ -45,7 +48,7 @@ def moving_average(dat, periods: int) -> np.ndarray:
     return np.convolve(dat, np.ones(periods) / periods, mode="same")
 
 
-def todatetime(time: Union[str, date, datetime, np.datetime64]) -> np.ndarray:
+def todatetime(time: str | date | datetime | np.datetime64) -> typing.Any:
 
     if isinstance(time, str):
         d = todatetime(parse(time))
@@ -67,7 +70,7 @@ def todatetime(time: Union[str, date, datetime, np.datetime64]) -> np.ndarray:
     return dates
 
 
-def todate(time: Union[str, date, datetime, np.datetime64]) -> np.ndarray:
+def todate(time: str | date | datetime | np.datetime64) -> typing.Any:
 
     if isinstance(time, str):
         d = todate(parse(time))

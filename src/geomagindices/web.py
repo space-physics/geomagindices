@@ -1,10 +1,10 @@
+from __future__ import annotations
 from pathlib import Path
 import ftplib
 import requests
 from urllib.parse import urlparse
 from datetime import datetime, timedelta
 import subprocess
-from typing import List
 import socket
 import requests.exceptions
 import numpy as np
@@ -20,7 +20,7 @@ URL20yearfcast = "https://sail.msfc.nasa.gov/solar_report_archives/May2016Rpt.pd
 TIMEOUT = 15  # seconds
 
 
-def downloadfile(time: np.ndarray, force: bool) -> List[Path]:
+def downloadfile(time: np.ndarray, force: bool) -> list[Path]:
 
     with importlib.resources.path(__package__, "__init__.py") as fn:
         path = fn.parent / "data"
