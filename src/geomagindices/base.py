@@ -10,8 +10,7 @@ from .io import load
 
 
 def get_indices(
-    time: str | datetime | date, smoothdays: int = None, forcedownload: bool = False
-) -> pandas.DataFrame:
+    time: str | datetime | date, smoothdays: int = None, forcedownload: bool = False, newsource: bool = True) -> pandas.DataFrame:
     """
     alternative going back to 1931:
     ftp://ftp.ngdc.noaa.gov/STP/GEOMAGNETIC_DATA/INDICES/KP_AP/
@@ -21,7 +20,7 @@ def get_indices(
     """
     dtime = todatetime(time)
 
-    fn = downloadfile(dtime, forcedownload)
+    fn = downloadfile(dtime, forcedownload, newsource)
     # %% load data
     dat: pandas.DataFrame = load(fn)
     # %% optional smoothing over days
@@ -34,7 +33,8 @@ def get_indices(
             dat["Aps"] = dat["Ap"].rolling(periods, min_periods=1).mean()
 
     # %% pull out the times we want
-    i = [dat.index.get_loc(t, method="nearest") for t in dtime]
+    # i = [dat.index.get_loc(t, method="nearest") for t in dtime]
+    i = dat.index.get_indexer(dtime, method = 'nearest') # fix for get_loc deprecation warning
     Indices = dat.iloc[i, :]
 
     return Indices

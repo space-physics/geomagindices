@@ -17,10 +17,13 @@ URLmonthly = {
 URLdaily = "ftp://ftp.ngdc.noaa.gov/STP/GEOMAGNETIC_DATA/INDICES/KP_AP/"
 URL45dayfcast = "https://services.swpc.noaa.gov/text/45-day-ap-forecast.txt"
 URL20yearfcast = "https://sail.msfc.nasa.gov/solar_report_archives/May2016Rpt.pdf"
+
+URLNewSource = 'ftp://ftp.gfz-potsdam.de/pub/home/obs/Kp_ap_Ap_SN_F107/'
+
 TIMEOUT = 15  # seconds
 
 
-def downloadfile(time: np.ndarray, force: bool) -> list[Path]:
+def downloadfile(time: np.ndarray, force: bool, newsource: bool) -> list[Path]:
 
     with importlib.resources.path(__package__, "__init__.py") as fn:
         path = fn.parent / "data"
@@ -34,18 +37,25 @@ def downloadfile(time: np.ndarray, force: bool) -> list[Path]:
     flist = []
     for t in time:
         if t < tnow:  # past
-            url = f"{URLdaily}{t.year}"
-            fn = path / f"{t.year}"
+            if not newsource:
+                url = f"{URLdaily}{t.year}"
+                fn = path / f"{t.year}"
+            else:
+                url = f"{URLNewSource}/Kp_ap_Ap_SN_F107_{t.year}.txt"
+                fn = path / f"Kp_ap_Ap_SN_F107_{t.year}.txt"
             if force or not exist_ok(fn):
                 try:
                     download(url, fn)
                     flist.append(fn)
-                except ConnectionError:  # backup, lower resolution
-                    for url in URLmonthly.values():
-                        fn = path / url.split("/")[-1]
-                        flist.append(fn)
-                        if not exist_ok(fn, timedelta(days=30)):
-                            download(url, fn)
+                except ConnectionError:  
+                    if not newsource: # backup, lower resolution
+                        for url in URLmonthly.values():
+                            fn = path / url.split("/")[-1]
+                            flist.append(fn)
+                            if not exist_ok(fn, timedelta(days=30)):
+                                download(url, fn)
+                    else: # no backup for newsource
+                        raise ConnectionError
             else:
                 flist.append(fn)
 

@@ -22,6 +22,8 @@ def load(flist: Path | list[Path]) -> pandas.DataFrame:
     for fn in flist:
         if len(fn.name) == 4:
             inds.append(readdaily(fn))
+        elif 'Kp_ap_Ap_SN_F107_' in fn.name:
+            inds.append(readdailynew(fn))
         elif fn.name == URLmonthly["f107"].split("/")[-1]:
             monthly_data["f107"] = read_monthly(fn)
         elif fn.name == URLmonthly["Ap"].split("/")[-1]:
@@ -85,6 +87,44 @@ def readdaily(flist: Path | list[Path]) -> pandas.DataFrame:
 
     return df
 
+def readdailynew(flist: Path | list[Path]) -> pandas.DataFrame:
+    kp_cols = [(34, 40), (41, 47), (48, 54), (55, 61), (62, 68), (69, 75), (76, 82), (83, 89)]
+    ap_cols = [(90, 94), (95, 99), (100, 104), (105, 109), (110, 114), (115, 119), (120, 124), (125, 129)]
+    f107_cols = (149, 157)
+
+    rawAp: list[str] = []
+    rawKp: list[str] = []
+    rawf107: list[str] = []
+    days = []
+
+    if isinstance(flist, Path):
+        flist = [flist]
+
+    for fn in flist:
+        with fn.open() as f:
+            for line in f:
+                if '#' == line[0]:
+                    continue
+                days.append(datetime(year=int(line[:4]), month=int(line[5:7]), day=int(line[8:10])))
+                rawAp += [line[i[0] : i[1]] for i in ap_cols]
+                rawKp += [line[i[0] : i[1]] for i in kp_cols]
+
+                # f10.7 is daily index
+                # MUCH faster to generate here than to fill after DF generation
+                rawf107 += [line[f107_cols[0] : f107_cols[1]]] * 8
+    # %% construct time
+    dtime = [day + timedelta(minutes=m) for day in days for m in range(90, 24 * 60 + 90, 3 * 60)]
+    # %% build and fill array
+    names = ["Ap", "Kp"]
+    df = pandas.DataFrame(index=dtime, columns=names)
+    # tolerate missing values
+    df["Ap"] = pandas.to_numeric(rawAp, errors="coerce")
+    df["Kp"] = pandas.to_numeric(rawKp, errors="coerce")
+    df["f107"] = pandas.to_numeric(rawf107, errors="coerce")
+
+    df["resolution"] = "d"
+
+    return df
 
 def read20yearfcast(fn: Path) -> pandas.DataFrame:
     """
