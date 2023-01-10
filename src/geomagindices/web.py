@@ -23,7 +23,7 @@ URLNewSource = 'ftp://ftp.gfz-potsdam.de/pub/home/obs/Kp_ap_Ap_SN_F107/'
 TIMEOUT = 15  # seconds
 
 
-def downloadfile(time: np.ndarray, force: bool, newsource: bool) -> list[Path]:
+def downloadfile(time: np.ndarray, smoothdays: int, force: bool, newsource: bool) -> list[Path]:
 
     with importlib.resources.path(__package__, "__init__.py") as fn:
         path = fn.parent / "data"
@@ -31,12 +31,15 @@ def downloadfile(time: np.ndarray, force: bool, newsource: bool) -> list[Path]:
             raise NotADirectoryError(path)
 
     time = np.asarray(time)
+    if smoothdays > 0:
+        t0 = time[0] - timedelta(smoothdays)
+    time = np.concatenate(([t0], time)) # used to handle year edge correctly when smoothdays is supplied
     tnow = datetime.today()
     nearfuture = tnow + timedelta(days=45)
 
     flist = []
     for t in time:
-        if t < tnow:  # past
+        if t.timestamp() < tnow.timestamp():  # past
             if not newsource:
                 url = f"{URLdaily}{t.year}"
                 fn = path / f"{t.year}"
@@ -59,17 +62,16 @@ def downloadfile(time: np.ndarray, force: bool, newsource: bool) -> list[Path]:
             else:
                 flist.append(fn)
 
-        elif (tnow <= t) & (t < nearfuture):  # near future
+        elif (tnow.timestamp() <= t.timestamp()) & (t.timestamp() < nearfuture.timestamp()):  # near future
             fn = path / URL45dayfcast.split("/")[-1]
             if force or not exist_ok(fn, timedelta(days=1)):
                 download(URL45dayfcast, fn)
 
             flist.append(fn)
-        elif t > nearfuture:  # future
+        elif t.timestamp() > nearfuture.timestamp():  # future
             flist.append((path / URL20yearfcast.split("/")[-1]).with_suffix(".txt"))
         else:
             raise ValueError(f"Raise a GitHub issue if this is a problem  {t}")
-
     return list(set(flist))  # dedupe
 
 
