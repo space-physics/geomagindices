@@ -9,7 +9,7 @@ import pytz
 from .web import downloadfile
 from .io import load
 
-def get_indices(time: str | datetime, smoothdays: int = None, forcedownload: bool = False, newsource: bool = True) -> pandas.DataFrame:
+def get_indices(time: str | datetime, smoothdays: int=None, forcedownload: bool=False, newsource: bool=True, tzaware: bool=False) -> pandas.DataFrame:
     """Get geomagnetic indices.
 
     alternative going back to 1931:
@@ -22,15 +22,16 @@ def get_indices(time: str | datetime, smoothdays: int = None, forcedownload: boo
     ftp://ftp.gfz-potsdam.de/pub/home/obs/Kp_ap_Ap_SN_F107/
 
     Args:
-        time (str | datetime): Timezone aware datetime.
+        time (str | datetime): Time near which datetime is evaluated.
         smoothdays (int, optional): Days to average over (for f10.7). Defaults to None.
         forcedownload (bool, optional): Force downloading data from servers every time. Defaults to False.
         newsource (bool, optional): Use the new datasource (newsource). Defaults to True.
+        tzaware (bool, optional): Whether supplied datetime is timezone aware.
 
     Returns:
         pandas.DataFrame: Dataframe containing the retrieved geomagnetic indices.
     """
-    dtime = todatetime(time)
+    dtime = todatetime(time, tzaware)
 
     _smoothdays = 0 if smoothdays is None else smoothdays # pass 0 if None
     fn = downloadfile(dtime, _smoothdays, forcedownload, newsource)
@@ -63,19 +64,22 @@ def moving_average(dat: pandas.Series, periods: int) -> np.ndarray:
     return np.convolve(dat, np.ones(periods) / periods, mode="same")
 
 
-def todatetime(time: str | date | datetime | np.datetime64) -> typing.Any:
+def todatetime(time: str | date | datetime | np.datetime64, tzaware: bool=True) -> typing.Any:
     if isinstance(time, str):
-        d = todatetime(parse(time))
+        d = todatetime(parse(time), tzaware)
     elif isinstance(time, datetime):
-        d = time.astimezone(pytz.utc).replace(tzinfo=None) # convert to UTC and strip timezone
+        if tzaware:
+            d = time.astimezone(pytz.utc).replace(tzinfo=None) # convert to UTC and strip timezone
+        else:
+            d = time.replace(tzinfo=None) # simply strip timezone info, old behavior
     elif isinstance(time, np.datetime64):
-        d = time.astype(datetime)
+        d = todatetime(time.astype(datetime), tzaware)
     elif isinstance(time, date):
-        d = datetime(time.year, time.month, time.day)
+        d = todatetime(datetime(time.year, time.month, time.day), tzaware)
     elif isinstance(time, (tuple, list, np.ndarray)):
-        d = np.atleast_1d([todatetime(t) for t in time]).squeeze()
+        d = np.atleast_1d([todatetime(t, tzaware) for t in time]).squeeze()
     elif isinstance(time, pandas.DatetimeIndex):
-        d = time.to_pydatetime()
+        d = todatetime(time.to_pydatetime(), tzaware)
     else:
         raise TypeError(f"{time} must be representable as datetime.datetime")
 
