@@ -87,6 +87,7 @@ def readdaily(flist: Path | list[Path]) -> pandas.DataFrame:
 
     return df
 
+
 def readdailynew(flist: Path | list[Path]) -> pandas.DataFrame:
     kp_cols = [(34, 40), (41, 47), (48, 54), (55, 61), (62, 68), (69, 75), (76, 82), (83, 89)]
     ap_cols = [(90, 94), (95, 99), (100, 104), (105, 109), (110, 114), (115, 119), (120, 124), (125, 129)]
@@ -125,6 +126,7 @@ def readdailynew(flist: Path | list[Path]) -> pandas.DataFrame:
     df["resolution"] = "d"
 
     return df
+
 
 def read20yearfcast(fn: Path) -> pandas.DataFrame:
     """

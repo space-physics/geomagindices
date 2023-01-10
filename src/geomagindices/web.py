@@ -33,7 +33,7 @@ def downloadfile(time: np.ndarray, smoothdays: int, force: bool, newsource: bool
     time = np.asarray(time)
     if smoothdays > 0:
         t0 = time[0] - timedelta(smoothdays)
-    time = np.concatenate(([t0], time)) # used to handle year edge correctly when smoothdays is supplied
+    time = np.concatenate(([t0], time))  # used to handle year edge correctly when smoothdays is supplied
     tnow = datetime.today()
     nearfuture = tnow + timedelta(days=45)
 
@@ -50,14 +50,14 @@ def downloadfile(time: np.ndarray, smoothdays: int, force: bool, newsource: bool
                 try:
                     download(url, fn)
                     flist.append(fn)
-                except ConnectionError:  
-                    if not newsource: # backup, lower resolution
+                except ConnectionError:
+                    if not newsource:  # backup, lower resolution
                         for url in URLmonthly.values():
                             fn = path / url.split("/")[-1]
                             flist.append(fn)
                             if not exist_ok(fn, timedelta(days=30)):
                                 download(url, fn)
-                    else: # no backup for newsource
+                    else:  # no backup for newsource
                         raise ConnectionError
             else:
                 flist.append(fn)

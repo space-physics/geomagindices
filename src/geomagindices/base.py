@@ -9,7 +9,8 @@ import pytz
 from .web import downloadfile
 from .io import load
 
-def get_indices(time: str | datetime, smoothdays: int=None, forcedownload: bool=False, newsource: bool=True, tzaware: bool=False) -> pandas.DataFrame:
+
+def get_indices(time: str | datetime, smoothdays: int = None, forcedownload: bool = False, newsource: bool = True, tzaware: bool = False) -> pandas.DataFrame:
     """Get geomagnetic indices.
 
     alternative going back to 1931:
@@ -33,7 +34,7 @@ def get_indices(time: str | datetime, smoothdays: int=None, forcedownload: bool=
     """
     dtime = todatetime(time, tzaware)
 
-    _smoothdays = 0 if smoothdays is None else smoothdays # pass 0 if None
+    _smoothdays = 0 if smoothdays is None else smoothdays  # pass 0 if None
     fn = downloadfile(dtime, _smoothdays, forcedownload, newsource)
     # %% load data
     dat: pandas.DataFrame = load(fn)
@@ -47,7 +48,7 @@ def get_indices(time: str | datetime, smoothdays: int=None, forcedownload: bool=
             dat["Aps"] = dat["Ap"].rolling(periods, min_periods=1).mean()
 
     # %% pull out the times we want
-    i = dat.index.get_indexer(dtime, method = 'nearest') # fix for get_loc deprecation warning
+    i = dat.index.get_indexer(dtime, method='nearest')  # fix for get_loc deprecation warning
     Indices = dat.iloc[i, :]
 
     return Indices
@@ -64,14 +65,14 @@ def moving_average(dat: pandas.Series, periods: int) -> np.ndarray:
     return np.convolve(dat, np.ones(periods) / periods, mode="same")
 
 
-def todatetime(time: str | date | datetime | np.datetime64, tzaware: bool=True) -> typing.Any:
+def todatetime(time: str | date | datetime | np.datetime64, tzaware: bool = True) -> typing.Any:
     if isinstance(time, str):
         d = todatetime(parse(time), tzaware)
     elif isinstance(time, datetime):
         if tzaware:
-            d = time.astimezone(pytz.utc).replace(tzinfo=None) # convert to UTC and strip timezone
+            d = time.astimezone(pytz.utc).replace(tzinfo=None)  # convert to UTC and strip timezone
         else:
-            d = time.replace(tzinfo=None) # simply strip timezone info, old behavior
+            d = time.replace(tzinfo=None)  # simply strip timezone info, old behavior
     elif isinstance(time, np.datetime64):
         d = todatetime(time.astype(datetime), tzaware)
     elif isinstance(time, date):
@@ -93,7 +94,7 @@ def todate(time: str | date | datetime | np.datetime64) -> typing.Any:
     if isinstance(time, str):
         d = todate(parse(time))
     elif isinstance(time, datetime):
-        d = time.astimezone(pytz.utc).replace(tzinfo=None).date() # convert to UTC and strip timezone
+        d = time.astimezone(pytz.utc).replace(tzinfo=None).date()  # convert to UTC and strip timezone
     elif isinstance(time, np.datetime64):
         d = time.astype(date)
     elif isinstance(time, date):
