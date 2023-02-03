@@ -1,12 +1,13 @@
-# Geomagnetic Indices
-
-[![DOI](https://zenodo.org/badge/173524807.svg)](https://zenodo.org/badge/latestdoi/173524807)
-![Actions Status](https://github.com/space-physics/geomagindices/workflows/ci/badge.svg)
-[![PyPi version](https://img.shields.io/pypi/pyversions/geomagindices.svg)](https://pypi.python.org/pypi/geomagindices)
-[![PyPi Download stats](http://pepy.tech/badge/geomagindices)](http://pepy.tech/project/geomagindices)
+# Geomagnetic Data Indices
 
 Geomagnetic indices downloader and parser, returns Ap, F10.7 (unsmoothed and smoothed) and Kp.
-Let us know via GitHub Issue if something is missing.
+
+This is derived from [geomagindices](https://pypi.org/project/geomagindices/), and has been modified to:
+
+- Support the new [post-SWPC data sources for all data dating back to 1932](ftp://ftp.gfz-potsdam.de/pub/home/obs/Kp_ap_Ap_SN_F107/).
+- Fix a bug where averaging would not cross year boundaries.
+
+It is a drop-in replacement for [geomagindices](https://pypi.org/project/geomagindices/).
 
 Output datatype is
 [pandas.DataFrame](http://pandas.pydata.org/pandas-docs/stable/reference/frame.html)
@@ -18,12 +19,25 @@ to find nearest time to request.
 
 Missing data is returned as `NaN` (Not a Number floating point value).
 
+## Installation
+Direct installation:
+```sh
+$ pip install geomagdata
+```
+
+Indirect installation:
+```sh
+$ git clone https://github.com/sunipkm/geomagdata
+$ cd geomagdata
+$ pip install .
+```
+
 ## Examples
 
 use from other programs like
 
 ```python
-import geomagindices as gi
+import geomagdata as gi
 
 inds = gi.get_indices(date)
 ```
@@ -38,14 +52,3 @@ python Examples/PlotIndices.py 2015-01-01 2016-01-01
 ```
 
 ![2015 Ap F10.7](./tests/2015.png)
-
-
-## Notes
-
-We should add readers for the new post-SWPC data sources, from 2018 onward as noted at:
-https://www.celestrak.com/SpaceData/SpaceWx-format.php
-
-* [Kp, Ap](ftp://ftp.gfz-potsdam.de/pub/home/obs/kp-ap/wdc/)
-* [f10.7](ftp://ftp.geolab.nrcan.gc.ca/data/solar_flux/daily_flux_values/fluxtable.txt)
-
-Let us know via GitHub Issue if you want this new data.

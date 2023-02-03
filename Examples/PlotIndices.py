@@ -12,7 +12,7 @@ from matplotlib.pyplot import show, figure
 import pandas
 from dateutil.parser import parse
 from datetime import timedelta
-import geomagindices as gi
+import geomagdata as gi
 
 
 if __name__ == "__main__":

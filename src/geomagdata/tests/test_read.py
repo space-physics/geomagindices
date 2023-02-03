@@ -3,7 +3,7 @@ from pytest import approx
 from datetime import date, timedelta, datetime
 import pandas
 
-import geomagindices as gi
+import geomagdata as gi
 
 
 @pytest.mark.parametrize(

@@ -88,22 +88,21 @@ def todatetime(time: str | date | datetime | np.datetime64, tzaware: bool = True
 
     return dates
 
+def cli():
+    """
+    simple demo of retrieving common geomagnetic indices by date
+    """
+    from argparse import ArgumentParser
 
-def todate(time: str | date | datetime | np.datetime64) -> typing.Any:
+    p = ArgumentParser()
+    p.add_argument("date", help="time of observation yyyy-mm-ddTHH:MM:ss")
+    p.add_argument("-s", "--smoothdays", help="days to smooth observation for f107a", type=int)
+    a = p.parse_args()
 
-    if isinstance(time, str):
-        d = todate(parse(time))
-    elif isinstance(time, datetime):
-        d = time.astimezone(pytz.utc).replace(tzinfo=None).date()  # convert to UTC and strip timezone
-    elif isinstance(time, np.datetime64):
-        d = time.astype(date)
-    elif isinstance(time, date):
-        d = time
-    elif isinstance(time, (tuple, list, np.ndarray)):
-        d = np.atleast_1d([todate(t) for t in time]).squeeze()
-    else:
-        raise TypeError(f"{time} must be representable as datetime.date")
+    inds = get_indices(a.date, a.smoothdays)
 
-    dates = np.atleast_1d(d).ravel()
+    print(inds)
 
-    return dates
+
+if __name__ == "__main__":
+    cli()

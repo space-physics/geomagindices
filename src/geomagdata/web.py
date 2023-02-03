@@ -33,7 +33,7 @@ def downloadfile(time: np.ndarray, smoothdays: int, force: bool, newsource: bool
     time = np.asarray(time)
     if smoothdays > 0:
         t0 = time[0] - timedelta(smoothdays)
-    time = np.concatenate(([t0], time))  # used to handle year edge correctly when smoothdays is supplied
+        time = np.concatenate(([t0], time))  # used to handle year edge correctly when smoothdays is supplied
     tnow = datetime.today()
     nearfuture = tnow + timedelta(days=45)
 
