@@ -109,7 +109,7 @@ def ftp_download(url: str, fn: Path):
         raise ConnectionError(f"Could not download {url} to {fn}")
 
 
-def exist_ok(fn: Path, maxage: datetime.timedelta = None) -> bool:
+def exist_ok(fn: Path, maxage: datetime.timedelta | None = None) -> bool:
     if not fn.is_file():
         return False
 

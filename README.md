@@ -21,11 +21,11 @@ use from other programs like
 ```python
 import geomagindices as gi
 
-inds = gi.get_indices(date)
+inds = gi.get_indices(datetime)
 ```
 
 where date is Python
-[datetime.date, datetime.datetime](https://docs.python.org/3/library/datetime.html), etc.
+[datetime.datetime](https://docs.python.org/3/library/datetime.html), etc.
 
 ---
 
@@ -34,7 +34,6 @@ python Examples/PlotIndices.py 2015-01-01 2016-01-01
 ```
 
 ![2015 Ap F10.7](./tests/2015.png)
-
 
 ## Notes
 

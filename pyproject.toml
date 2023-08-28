@@ -21,7 +21,7 @@ dependencies = ["python-dateutil", "pandas", "requests", "numpy"]
 
 [project.optional-dependencies]
 tests = ["pytest"]
-lint = ["flake8", "flake8-bugbear", "flake8-builtins", "flake8-blind-except", "mypy"]
+lint = ["flake8", "flake8-bugbear", "flake8-builtins", "flake8-blind-except", "mypy", "types-requests", "types-python-dateutil"]
 
 [tool.setuptools.dynamic]
 readme = {file = ["README.md"], content-type = "text/markdown"}
@@ -32,7 +32,6 @@ line-length = 90
 [tool.mypy]
 files = ["src"]
 ignore_missing_imports = true
-strict_optional = false
 allow_redefinition = true
 show_error_context = false
 show_column_numbers = true

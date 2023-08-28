@@ -8,7 +8,7 @@ from .io import load
 
 
 def get_indices(
-    time, smoothdays: int = None, forcedownload: bool = False
+    time, smoothdays: int | None = None, forcedownload: bool = False
 ) -> pandas.DataFrame:
     """
     alternative going back to 1931:
