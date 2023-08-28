@@ -1,21 +1,20 @@
 import pytest
 from pytest import approx
-from datetime import date, timedelta, datetime
+from datetime import timedelta, datetime
 import pandas
 
 import geomagindices as gi
 
 
 @pytest.mark.parametrize(
-    "dt,hour,f107,f107s,ap,aps,kp",
+    "dt,f107,f107s,ap,aps,kp",
     [
-        (date(2017, 5, 1), 1, 76.4, 77.36, 9, 11.66, 2.3),
-        (datetime(2017, 5, 1, 12), 13, 76.4, 77.39, 2, 11.65, 0.3),
-        (datetime(2020, 3, 31, 12), 1, 69.55, 70.22, 5, 5.67, -1),
+        (datetime(2017, 5, 1), 76.4, 77.36, 9, 11.66, 2.3),
+        (datetime(2017, 5, 1, 12), 76.4, 77.39, 2, 11.65, 0.3),
+        (datetime(2020, 3, 31, 12), 69.55, 70.22, 5, 5.67, -1),
     ],
 )
-def test_past(dt, hour, f107, f107s, ap, aps, kp):
-
+def test_past(dt, f107, f107s, ap, aps, kp):
     try:
         dat = gi.get_indices(dt, 81)
     except ConnectionError as e:
@@ -31,7 +30,6 @@ def test_past(dt, hour, f107, f107s, ap, aps, kp):
 
 
 def test_nearfuture():
-
     t = datetime.today() + timedelta(days=3)
 
     try:
@@ -51,8 +49,7 @@ def test_nearfuture():
 
 
 def test_farfuture():
-
-    t = date(2029, 12, 21)
+    t = datetime(2029, 12, 21)
 
     dat = gi.get_indices(t, 81)
 
@@ -66,8 +63,7 @@ def test_farfuture():
 
 
 def test_list():
-
-    t = [date(2018, 1, 1), datetime(2018, 1, 2)]
+    t = [datetime(2018, 1, 1), datetime(2018, 1, 2)]
 
     try:
         dat = gi.get_indices(t)
@@ -81,7 +77,9 @@ def test_list():
 
 
 def test_multi_past():
-    dates = pandas.date_range(datetime(2017, 12, 31, 23), datetime(2018, 1, 1, 2), freq="3H")
+    dates = pandas.date_range(
+        datetime(2017, 12, 31, 23), datetime(2018, 1, 1, 2), freq="3H"
+    )
 
     try:
         dat = gi.get_indices(dates)

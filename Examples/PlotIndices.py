@@ -20,7 +20,9 @@ if __name__ == "__main__":
 
     p = ArgumentParser()
     p.add_argument(
-        "start_stop", help="date or date range of observation yyyy-mm-dd  (START, STOP)", nargs="+"
+        "start_stop",
+        help="date or date range of observation yyyy-mm-dd  (START, STOP)",
+        nargs="+",
     )
     a = p.parse_args()
 

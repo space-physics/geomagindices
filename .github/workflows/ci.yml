@@ -4,34 +4,24 @@ on: [push, pull_request]
 
 jobs:
 
-  linux:
-    runs-on: ubuntu-latest
+  core:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [linux-latest, windows-latest, macos-latest]
+        python: ["3.9", "3.11"]
+
     steps:
     - uses: actions/checkout@v3
+
     - uses: actions/setup-python@v4
       with:
-        python-version: 3.9
+        python-version: ${{ matrix.python }}
 
     - run: pip install .[tests,lint]
 
     - run: flake8
     - run: mypy
-
-    - run: pytest
-
-
-  integration:
-    needs: linux
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [windows-latest, macos-latest]
-    steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v4
-      with:
-        python-version: 3.9
-
-    - run: pip install .[tests]
 
     - run: pytest

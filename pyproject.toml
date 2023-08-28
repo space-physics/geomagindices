@@ -1,8 +1,38 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "geomagindices"
+version = "1.5.0"
+description = "Download and parse geomagnetic indices"
+keywords = ["aeronomy", "ionosphere"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Console",
+  "Intended Audience :: Science/Research",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Atmospheric Science"
+]
+dynamic = ["readme"]
+requires-python = ">=3.9"
+dependencies = ["python-dateutil", "pandas", "requests", "numpy"]
+
+[project.optional-dependencies]
+tests = ["pytest"]
+lint = ["flake8", "flake8-bugbear", "flake8-builtins", "flake8-blind-except", "mypy"]
+
+[tool.setuptools.dynamic]
+readme = {file = ["README.md"], content-type = "text/markdown"}
 
 [tool.black]
-line-length = 100
+line-length = 90
 
-[tool.pytest.ini_options]
-addopts = "-ra -v"
+[tool.mypy]
+files = ["src"]
+ignore_missing_imports = true
+strict_optional = false
+allow_redefinition = true
+show_error_context = false
+show_column_numbers = true

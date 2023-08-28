@@ -12,10 +12,6 @@ Output datatype is
 [pandas.DataFrame](http://pandas.pydata.org/pandas-docs/stable/reference/frame.html)
 (for multiple times)
 
-internally, uses
-[pandas.Index.get_loc](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Index.get_loc.html)
-to find nearest time to request.
-
 Missing data is returned as `NaN` (Not a Number floating point value).
 
 ## Examples
