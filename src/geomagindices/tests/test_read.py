@@ -78,7 +78,7 @@ def test_list():
 
 def test_multi_past():
     dates = pandas.date_range(
-        datetime(2017, 12, 31, 23), datetime(2018, 1, 1, 2), freq="3H"
+        datetime(2017, 12, 31, 23), datetime(2018, 1, 1, 2), freq="3h"
     )
 
     try:
@@ -98,7 +98,7 @@ def test_past_and_future():
         pytest.skip(f"possible timeout error {e}")
 
     pasttime = datetime(2017, 1, 1)
-    if dat["resolution"][0] == "d":
+    if dat["resolution"].iloc[0] == "d":
         pasttime += timedelta(hours=1, minutes=30)
 
     assert (dat.index == [pasttime, datetime(2030, 3, 2, 22, 55, 11, 999997)]).all()

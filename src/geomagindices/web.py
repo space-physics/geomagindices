@@ -98,9 +98,10 @@ def ftp_download(url: str, fn: Path):
         raise NotADirectoryError(fn.parent)
 
     try:
-        with ftplib.FTP(host, "anonymous", "guest", timeout=TIMEOUT) as F, fn.open(
-            "wb"
-        ) as f:
+        with (
+            ftplib.FTP(host, "anonymous", "guest", timeout=TIMEOUT) as F,
+            fn.open("wb") as f,
+        ):
             F.cwd(path)
             F.retrbinary(f"RETR {fn.name}", f.write)
     except (socket.timeout, ftplib.error_perm, socket.gaierror):
@@ -118,7 +119,8 @@ def exist_ok(fn: Path, maxage: datetime.timedelta | None = None) -> bool:
     ok &= finf.st_size > 1000
     if maxage is not None:
         ok &= (
-            datetime.datetime.now() - datetime.datetime.utcfromtimestamp(finf.st_mtime)
+            datetime.datetime.now(datetime.timezone.utc)
+            - datetime.datetime.fromtimestamp(finf.st_mtime, datetime.timezone.utc)
             <= maxage
         )
 

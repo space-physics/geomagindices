@@ -7,9 +7,7 @@ from .web import downloadfile
 from .io import load
 
 
-def get_indices(
-    time, smoothdays: int | None = None, forcedownload: bool = False
-) -> pandas.DataFrame:
+def get_indices(time, smoothdays: int | None = None, forcedownload: bool = False):
     """
     alternative going back to 1931:
     ftp://ftp.ngdc.noaa.gov/STP/GEOMAGNETIC_DATA/INDICES/KP_AP/

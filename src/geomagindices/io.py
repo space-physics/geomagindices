@@ -8,7 +8,7 @@ from dateutil.parser import parse
 from .web import URLmonthly, URL45dayfcast, URL20yearfcast
 
 
-def load(flist: Path | list[Path]) -> pandas.DataFrame:
+def load(flist: Path | list[Path]):
     """
     select data to load and collect into pandas.Dataframe by time
     """
@@ -43,7 +43,7 @@ def load(flist: Path | list[Path]) -> pandas.DataFrame:
 # not lru_cache b/c list[path]
 
 
-def readdaily(flist: Path | list[Path]) -> pandas.DataFrame:
+def readdaily(flist: Path | list[Path]):
     kp_cols = [
         (12, 14),
         (14, 16),
@@ -112,7 +112,7 @@ def readdaily(flist: Path | list[Path]) -> pandas.DataFrame:
     return df
 
 
-def read20yearfcast(fn: Path) -> pandas.DataFrame:
+def read20yearfcast(fn: Path):
     """
     uses 50th percentile of Ap and f10.7
     """
@@ -137,28 +137,28 @@ def read20yearfcast(fn: Path) -> pandas.DataFrame:
     return data
 
 
-def read_monthly(file: Path) -> pandas.Series:
+def read_monthly(file: Path):
     if file.suffix == ".json":
-        dat = pandas.read_json(file)
+        djs = pandas.read_json(file)
 
-        date = [datetime.datetime(int(ym[:4]), int(ym[5:7]), 1) for ym in dat["time-tag"]]
-        data = pandas.Series(index=date, data=dat["f10.7"].values)
+        date = [datetime.datetime(int(ym[:4]), int(ym[5:7]), 1) for ym in djs["time-tag"]]
+        data = pandas.Series(index=date, data=djs["f10.7"].values)
     elif file.suffix == ".ave":
-        dat = np.genfromtxt(file, usecols=range(1, 14), missing_values=".")
+        darr = np.genfromtxt(file, usecols=range(1, 14), missing_values=".")
 
         date = []
-        for year in dat[:, 0]:
+        for year in darr[:, 0]:
             for month in range(1, 13):
                 date.append(datetime.datetime(int(year), month, 1))
 
-        data = pandas.Series(index=date, data=dat[:, 1:].ravel())
+        data = pandas.Series(index=date, data=darr[:, 1:].ravel())
 
     data[data < 0] = np.nan  # by NOAA definition
 
     return data
 
 
-def read45dayfcast(fn: Path) -> pandas.DataFrame:
+def read45dayfcast(fn: Path):
     Ap: list[int] = []
 
     with fn.open("r") as f:

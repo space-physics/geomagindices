@@ -32,6 +32,3 @@ line-length = 90
 [tool.mypy]
 files = ["src"]
 ignore_missing_imports = true
-allow_redefinition = true
-show_error_context = false
-show_column_numbers = true
