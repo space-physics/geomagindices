@@ -37,9 +37,6 @@ def get_indices(time, smoothdays: int | None = None, forcedownload: bool = False
     return Indices
 
 
-getApF107 = get_indices  # legacy
-
-
 def moving_average(dat: pandas.Series, periods: int):
     if periods > dat.size:
         raise ValueError("cannot smooth over more time periods than exist in the data")

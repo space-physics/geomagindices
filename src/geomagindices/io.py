@@ -44,26 +44,12 @@ def load(flist: Path | list[Path]):
 
 
 def readdaily(flist: Path | list[Path]):
-    kp_cols = [
-        (12, 14),
-        (14, 16),
-        (16, 18),
-        (18, 20),
-        (20, 22),
-        (22, 24),
-        (24, 26),
-        (26, 28),
-    ]
-    ap_cols = [
-        (31, 34),
-        (34, 37),
-        (37, 40),
-        (40, 43),
-        (43, 46),
-        (46, 49),
-        (49, 52),
-        (52, 55),
-    ]
+    kp_width = 2
+    kp_cols = range(12, 28, kp_width)
+
+    ap_width = 3
+    ap_cols = range(31, 55, ap_width)
+
     f107_cols = (65, 70)
 
     rawAp: list[str] = []
@@ -84,8 +70,8 @@ def readdaily(flist: Path | list[Path]):
                 days.append(
                     datetime.datetime(year=year, month=int(line[2:4]), day=int(line[4:6]))
                 )
-                rawAp += [line[i[0] : i[1]] for i in ap_cols]
-                rawKp += [line[i[0] : i[1]] for i in kp_cols]
+                rawAp += [line[i : i + ap_width] for i in ap_cols]
+                rawKp += [line[i : i + kp_width] for i in kp_cols]
 
                 # f10.7 is daily index
                 # MUCH faster to generate here than to fill after DF generation
@@ -96,6 +82,7 @@ def readdaily(flist: Path | list[Path]):
         for day in days
         for m in range(90, 24 * 60 + 90, 3 * 60)
     ]
+
     # %% build and fill array
     names = ["Ap", "Kp"]
     df = pandas.DataFrame(index=dtime, columns=names)
