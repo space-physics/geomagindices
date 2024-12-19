@@ -2,6 +2,7 @@ import pytest
 from pytest import approx
 from datetime import timedelta, datetime
 import pandas
+import numpy as np
 
 import geomagindices as gi
 
@@ -12,6 +13,7 @@ import geomagindices as gi
         (datetime(2017, 5, 1), 76.4, 77.36, 9, 11.66, 2.3),
         (datetime(2017, 5, 1, 12), 76.4, 77.39, 2, 11.65, 0.3),
         (datetime(2020, 3, 31, 12), 69.55, 70.22, 5, 5.67, -1),
+        (datetime(2011, 1, 1), np.nan, np.nan, 5, 5, 1.3),
     ],
 )
 def test_past(dt, f107, f107s, ap, aps, kp):
@@ -21,8 +23,8 @@ def test_past(dt, f107, f107s, ap, aps, kp):
         pytest.skip(f"possible timeout error {e}")
 
     assert dat.shape[0] == 1
-    assert dat["f107"].iloc[0] == approx(f107, abs=0.1)
-    assert dat["f107s"].iloc[0] == approx(f107s, abs=0.1)
+    assert dat["f107"].iloc[0] == approx(f107, abs=0.1, nan_ok=np.isnan(f107))
+    assert dat["f107s"].iloc[0] == approx(f107s, abs=0.1, nan_ok=np.isnan(f107))
     assert dat["Ap"].iloc[0] == ap
     assert dat["Aps"].iloc[0] == approx(aps, abs=0.1)
     if "Kp" in dat:
