@@ -4,7 +4,7 @@ import numpy as np
 from datetime import timedelta
 
 from .web import downloadfile
-from .io import load
+from .dataio import load
 
 
 def get_indices(time, smoothdays: int | None = None, forcedownload: bool = False):

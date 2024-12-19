@@ -33,7 +33,7 @@ where date is Python
 python Examples/PlotIndices.py 2015-01-01 2016-01-01
 ```
 
-![2015 Ap F10.7](./tests/2015.png)
+![2015 Ap F10.7](https://github.com/space-physics/geomagindices/blob/main/src/geomagindices/tests/2015.png)
 
 ## Notes
 
