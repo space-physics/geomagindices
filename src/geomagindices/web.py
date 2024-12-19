@@ -66,6 +66,7 @@ def downloadfile(time, force: bool) -> list[Path]:
 
 
 def download(url: str, fn: Path):
+    print(f"geomagindies: downloading {url} => {fn}")
     if url.startswith("http"):
         http_download(url, fn)
     elif url.startswith("ftp"):
